@@ -1,3 +1,4 @@
+<!-- ACTIVITY PUB USE KORA ZAY -->
 Exhaustive list of social media data model:
 
 #### Users:
