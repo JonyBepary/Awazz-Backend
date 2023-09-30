@@ -7,3 +7,7 @@ import (
 type User struct {
 	ac.Actor
 }
+
+func (user *User) CreateUser() string {
+	return "user created by saria san"
+}
