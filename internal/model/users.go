@@ -9,5 +9,5 @@ type User struct {
 }
 
 func (user *User) CreateUser() string {
-	return "user created by saria san"
+	return "user created"
 }
