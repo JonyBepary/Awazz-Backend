@@ -4,10 +4,11 @@ import (
 	ac "github.com/go-ap/activitypub"
 )
 
-type User struct {
+type Account struct {
 	ac.Actor
+	Password string
+	Email string
+	Bio string
+
 }
 
-func (user *User) CreateUser() string {
-	return "user created by saria san"
-}
