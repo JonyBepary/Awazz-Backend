@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package model;
+
+import "google/protobuf/timestamp.proto";
+
+
+message Person {
+    string id = 1;
+    string attachment = 4;
+    string attributedTo = 5;
+    string context = 8;
+    string mediaType = 9;
+    google.protobuf.Timestamp endTime = 10;
+    string generator = 11;
+    string icon = 12;
+    string image = 13;
+    string inReplyTo = 14;
+    string location = 15;
+    string preview = 16;
+    google.protobuf.Timestamp published = 17;
+    string replies = 18;
+    google.protobuf.Timestamp startTime = 19;
+    string summary = 20;
+    repeated string tag = 21;
+    google.protobuf.Timestamp updated = 22;
+    string url = 23;
+    repeated string to = 24;
+    repeated string bto = 25;
+    repeated string cc = 26;
+    repeated string bcc = 27;
+    string likes = 29;
+    string shares = 30;
+    string inbox = 32;
+    string outbox = 33;
+    string following = 34;
+    string followers = 35;
+    string liked = 36;
+    string preferredUsername = 37;
+    string endpoints = 38;
+    repeated string streams = 39;
+    string publicKey = 40;
+}
+
+
+message Account {
+	Person person = 1;
+	string password = 2;
+	string email = 3;
+	string phone = 4;
+	google.protobuf.Timestamp created_at = 5;
+	google.protobuf.Timestamp updated_at = 6;
+}
+
+// collection of Persons
+message Persons {
+    repeated Person Persons = 1;
+}
+// collection of Accounts
+message Accounts {
+    repeated Account accounts = 1;
+}
+
