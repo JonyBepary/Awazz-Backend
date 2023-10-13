@@ -1,0 +1,28 @@
+// #### Comments:
+// - Comment ID
+// - Post ID
+// - User ID
+// - Comment Text
+// - Created Date
+// - Updated Date
+// - Likes Count
+// - Replies Count
+
+syntax = "proto3";
+
+package model;
+
+import "google/protobuf/timestamp.proto";
+
+message Comments{
+    string id = 1;
+    string user = 2;
+    string post_id = 3;
+    string user_id = 4;
+    string text = 5 ;
+    google.protobuf.Timestamp created_date = 6 ;
+    google.protobuf.Timestamp updated_date = 7 ;
+    int64 likes = 8;
+    int64 replies = 9;
+}
+

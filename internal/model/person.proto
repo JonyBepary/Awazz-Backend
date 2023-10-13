@@ -37,7 +37,7 @@ message Person {
     string followers = 35;
     string liked = 36;
     string preferredUsername = 37;
-    string endpoints = 38;
+    string endpoints = 38;//no need
     repeated string streams = 39;
     string publicKey = 40;
 }
@@ -46,8 +46,8 @@ message Person {
 message Account {
 	Person person = 1;
 	string password = 2;
-	string email = 3;
-	string phone = 4;
+	string email = 3; //optional
+	string phone = 4; //optional
 	google.protobuf.Timestamp created_at = 5;
 	google.protobuf.Timestamp updated_at = 6;
 }
