@@ -12,7 +12,7 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
 vendor/modules.txt
 vendor/git.sr.ht/~mariusor/go-xsd-duration/LICENSE
 vendor/git.sr.ht/~mariusor/go-xsd-duration/xsd_duration.go
