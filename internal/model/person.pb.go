@@ -57,7 +57,7 @@ type Person struct {
 	Followers         string                 `protobuf:"bytes,35,opt,name=followers,proto3" json:"followers,omitempty"`
 	Liked             string                 `protobuf:"bytes,36,opt,name=liked,proto3" json:"liked,omitempty"`
 	PreferredUsername string                 `protobuf:"bytes,37,opt,name=preferredUsername,proto3" json:"preferredUsername,omitempty"`
-	Endpoints         string                 `protobuf:"bytes,38,opt,name=endpoints,proto3" json:"endpoints,omitempty"`
+	Endpoints         string                 `protobuf:"bytes,38,opt,name=endpoints,proto3" json:"endpoints,omitempty"` //no need
 	Streams           []string               `protobuf:"bytes,39,rep,name=streams,proto3" json:"streams,omitempty"`
 	PublicKey         string                 `protobuf:"bytes,40,opt,name=publicKey,proto3" json:"publicKey,omitempty"`
 }
@@ -339,8 +339,8 @@ type Account struct {
 
 	Person    *Person                `protobuf:"bytes,1,opt,name=person,proto3" json:"person,omitempty"`
 	Password  string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Email     string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Phone     string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	Email     string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"` //optional
+	Phone     string                 `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"` //optional
 	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 }
@@ -605,7 +605,8 @@ var file_person_proto_rawDesc = []byte{
 	0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x73, 0x12, 0x2a, 0x0a, 0x08, 0x61, 0x63, 0x63, 0x6f,
 	0x75, 0x6e, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6d, 0x6f, 0x64,
 	0x65, 0x6c, 0x2e, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x08, 0x61, 0x63, 0x63, 0x6f,
-	0x75, 0x6e, 0x74, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x6e, 0x74, 0x73, 0x42, 0x09, 0x5a, 0x07, 0x2e, 0x3b, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
