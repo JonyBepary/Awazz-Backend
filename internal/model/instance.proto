@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+import "google/protobuf/timestamp.proto";
+
+// Community represents a single community.
+message Community {
+  // Unique identifier for the user
+  string id = 1;
+
+  // Instance ID for the user
+  string instance_id = 2;
+
+  // Name of the user
+  string name = 3;
+
+  // Description of the user
+  string description = 4;
+
+  // Icon URL for the user
+  string icon = 5;
+
+  // Cover image URL for the user
+  string cover = 6;
+
+  // Timestamp when the user was created
+  google.protobuf.Timestamp created_at = 7;
+
+  // Timestamp when the user was last updated
+  google.protobuf.Timestamp updated_at = 8;
+
+  // Number of members in the user's group
+  int64 members = 9;
+  repeated string admins = 10;
+  repeated string moderators = 11;
+  repeated string post = 12;
+}
+
+
+// Instance represents a single instance of a resource.
+message Instance {
+    // Unique identifier for the instance.
+    string id = 1;
+    // Name of the instance.
+    string name = 2;
+    // Description of the instance.
+    string description = 3;
+    // Type of the instance.
+    string type = 4;
+    // Status of the instance.
+    string status = 5;
+    // Owner of the instance.
+    string owner = 6;
+    // Creator of the instance.
+    string created_by = 7;
+    // List of community IDs associated with the instance.
+    repeated string community_ids = 8;
+    // Timestamp when the instance was created.
+    google.protobuf.Timestamp created_at = 9;
+    // Updater of the instance.
+    string updated_by = 10;
+    // Timestamp when the instance was last updated.
+    google.protobuf.Timestamp updated_at = 11;
+    // Deleter of the instance.
+    string deleted_by = 12;
+    // Timestamp when the instance was deleted.
+    google.protobuf.Timestamp deleted_at = 13;
+    // List of tags associated with the instance.
+    repeated string tags = 14;
+    // List of labels associated with the instance.
+    repeated string labels = 15;
+    // list of public domain of the instance.
+    repeated string public_domain = 16;
+}
