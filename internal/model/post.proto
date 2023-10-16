@@ -2,39 +2,107 @@ syntax = "proto3";
 
 package model;
 option go_package = ".;model";
+
 import "google/protobuf/timestamp.proto";
 
+// Post represents a post in a social media platform.
 message Post {
+  // Unique identifier for the post.
   string id = 1;
+
+  // Community to which the post belongs.
   string community = 2;
+
+  // Content of the post.
   string content = 3;
+
+  // Timestamp when the post was created.
   google.protobuf.Timestamp created_at = 4;
+
+  // Timestamp when the post was last updated.
   google.protobuf.Timestamp updated_at = 5;
+
+  // Timestamp when the post was deleted.
   google.protobuf.Timestamp deleted_at = 6;
+
+  // Number of likes the post has received.
   int64 likes = 7;
+
+  // Number of shares the post has received.
   int64 shares = 8;
+
+  // Number of comments the post has received.
   int64 comments = 9;
+
+  // Author of the post.
   string author = 10;
+
+  // Parent post of the current post.
   string parent = 11;
-  repeated string children = 12;
-  repeated string tags = 13;
-  repeated string mentions = 14;
-  bool is_sensitive = 15;
-  bool is_nsfw = 16;
-  bool is_deleted = 17;
-  bool is_pinned = 18;
-  bool is_edited = 19;
-  bool is_liked = 20;
-  bool is_shared = 21;
-  bool is_commented = 22;
-  bool is_subscribed = 23;
-  bool is_bookmarked = 24;
-  bool is_reblogged = 25;
-  bool is_mentioned = 26;
-  bool is_poll = 27;
-  bool is_poll_voted = 28;
-  bool is_poll_expired = 29;
-  bool is_poll_closed = 30;
-  bool is_poll_multiple = 31;
-  bool is_poll_hide_totals = 32;
+
+  // Rank of the post.
+  int64 rank = 12;
+
+  // Child posts of the current post.
+  repeated string children = 13;
+
+  // Tags associated with the post.
+  repeated string tags = 14;
+
+  // Users mentioned in the post.
+  repeated string mentions = 15;
+
+  // Indicates if the post is sensitive.
+  bool is_sensitive = 16;
+
+  // Indicates if the post is not safe for work.
+  bool is_nsfw = 17;
+
+  // Indicates if the post has been deleted.
+  bool is_deleted = 18;
+
+  // Indicates if the post is pinned.
+  bool is_pinned = 19;
+
+  // Indicates if the post has been edited.
+  bool is_edited = 20;
+
+  // Indicates if the post has been liked by the user.
+  bool is_liked = 21;
+
+  // Indicates if the post has been shared by the user.
+  bool is_shared = 22;
+
+  // Indicates if the post has been commented on by the user.
+  bool is_commented = 23;
+
+  // Indicates if the user is subscribed to the post.
+  bool is_subscribed = 24;
+
+  // Indicates if the post has been bookmarked by the user.
+  bool is_bookmarked = 25;
+
+  // Indicates if the post has been reblogged by the user.
+  bool is_reblogged = 26;
+
+  // Indicates if the user has been mentioned in the post.
+  bool is_mentioned = 27;
+
+  // Indicates if the post is a poll.
+  bool is_poll = 28;
+
+  // Indicates if the user has voted in the poll.
+  bool is_poll_voted = 29;
+
+  // Indicates if the poll has expired.
+  bool is_poll_expired = 30;
+
+  // Indicates if the poll has been closed.
+  bool is_poll_closed = 31;
+
+  // Indicates if the poll allows multiple choices.
+  bool is_poll_multiple = 32;
+
+  // Indicates if the poll hides the total number of votes.
+  bool is_poll_hide_totals = 33;
 }
