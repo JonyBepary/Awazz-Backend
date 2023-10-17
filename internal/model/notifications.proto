@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+import "google/protobuf/timestamp.proto";
+
+message Notifications{
+    string title= 1;
+    string body= 2;
+    string source = 3;
+    string image = 4;
+    string sound= 5 ;
+    google.protobuf.Timestamp time = 6 ;
+    string channel = 7;
+    int64 priority_level = 8;
+}
+
