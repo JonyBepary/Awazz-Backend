@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+import "google/protobuf/timestamp.proto";
+
+message Follows{
+    string follower_id= 1;
+    string followee_id= 2;
+    bool status = 3;
+    google.protobuf.Timestamp time = 4 ;
+}
+
