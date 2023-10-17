@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+import "google/protobuf/timestamp.proto";
+
+message Likes {
+    int64 post_id = 1;
+    int64 user_id = 2;
+    int64 comment_id = 3;
+    google.protobuf.Timestamp created_at = 4;
+}

@@ -24,5 +24,7 @@ message Comments{
     google.protobuf.Timestamp updated_date = 7 ;
     int64 likes = 8;
     int64 replies = 9;
+    bool is_deleted = 10;
+    bool is_updated = 11;
 }
 

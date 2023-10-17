@@ -1,1 +1,69 @@
 package model
+
+import (
+	"fmt"
+
+	"github.com/syndtr/goleveldb/leveldb"
+	"google.golang.org/protobuf/proto"
+)
+
+// Comments is the database model for comments.
+func (cm *Comments) Get() error {
+	//leveldb get
+	db, err := leveldb.OpenFile("Database/comments", nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	data, err := db.Get([]byte(fmt.Sprintf("comment-%v-%v", cm.PostId, cm.Id)), nil)
+	if err != nil {
+		return err
+	}
+	err = proto.Unmarshal(data, cm)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cm *Comments) Save() error {
+	//leveldb put
+	db, err := leveldb.OpenFile("Database/comments", nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	data, err := proto.Marshal(cm)
+	if err != nil {
+		return err
+	}
+	err = db.Put([]byte(fmt.Sprintf("comment-%v-%v", cm.PostId, cm.Id)), data, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetNComments(postId string, N int) ([]*Comments, error) {
+	//leveldb get
+	db, err := leveldb.OpenFile("Database/comments", nil)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+	iterator := db.NewIterator(nil, nil)
+	defer iterator.Release()
+	var comments []*Comments
+	for iterator.Next() && len(comments) < N+1 {
+		var cm Comments
+		err = proto.Unmarshal(iterator.Value(), &cm)
+		if err != nil {
+			return nil, err
+		}
+		if cm.PostId == postId {
+			comments = append(comments, &cm)
+		}
+
+	}
+	return comments, nil
+}
