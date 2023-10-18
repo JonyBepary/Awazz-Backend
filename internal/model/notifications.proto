@@ -13,5 +13,8 @@ message Notifications{
     google.protobuf.Timestamp time = 6 ;
     string channel = 7;
     int64 priority_level = 8;
+    bool readStatus = 9;
+    google.protobuf.Timestamp created = 10;
+
 }
 
