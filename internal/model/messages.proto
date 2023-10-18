@@ -1,21 +1,21 @@
-syntax = "proto3";
+syntax  = "proto3";
 
 package model;
-option go_package = ".;model";
+option go_package  = ".;model";
 import "google/protobuf/timestamp.proto";
 
 message Messages{
-    string msg_id= 1;
-    string sender_id= 2;
-    string receiver_id = 3;
-    string content = 4 ;
-    google.protobuf.Timestamp sent_time = 5 ;
-    google.protobuf.Timestamp last_edit = 6;
-    google.protobuf.Timestamp delete_time = 7;
-    bool status = 8 ;
-    string attachment = 9 ;
-    string type = 10;
-    string reaction = 11;
+    string msg_id = 1;
+    string sender_id = 2;
+    string receiver_id  = 3;
+    string content  = 4 ;
+    google.protobuf.Timestamp sent_time  = 5 ;
+    google.protobuf.Timestamp last_edit  = 6;
+    google.protobuf.Timestamp delete_time  = 7;
+    bool status  = 8 ;
+    string attachment  = 9 ;
+    string types  = 10;
+    string reaction  = 11;
 }
 
 
