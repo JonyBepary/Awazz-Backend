@@ -66,13 +66,16 @@ var column_type []string = []string{
 	"TEXT",
 	"INTEGER",
 	"TEXT",
+	"BLOB",
 	"BLOB"}
 
 func (p *Person) SavePerson() error {
-	db,
-		err := durable.CreateDatabase("Database/comments")
+	db, err := durable.CreateDatabase("Database/comments")
 	if err != nil {
 		return err
 	}
-	db.Query(fmt.Sprintf("CREATE TABLE PERSON ( %v)", durable.SetColumn(column, column_type)))
+	defer db.Close()
+	fmt.Printf("CREATE TABLE IF NOT EXISTS PERSON ( %v)\n", durable.SetColumn(column, column_type))
+	// db.Query(fmt.Sprintf("CREATE TABLE PERSON ( %v)", durable.SetColumn(column, column_type)))
+	return nil
 }
