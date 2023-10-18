@@ -24,9 +24,6 @@ func (p *Post) SavePost() error {
 	    Author VARCHAR(128),
 	    Parent INT,
 	    Rank INT,
-	    Children VARCHAR(128),
-	    Tags VARCHAR(128),
-	    Mentions VARCHAR(128),
 	    IsSensitive bool,
 	    IsNsfw bool,
 	    IsDeleted bool,
@@ -51,7 +48,7 @@ func (p *Post) SavePost() error {
 		panic(err)
 	}
 	str2 := `
-INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Shares,Comments,Author,Parent,Rank,Children,Tags,Mentions,IsSensitive,IsNsfw,IsDeleted,IsPinned,IsEdited,IsLiked,IsShared,IsCommented,IsSubscribed,IsBookmarked,IsReblogged,IsMentioned,IsPoll,IsPollVoted,IsPollExpired,IsPollClosed,IsPollMultiple,IsPollHideTotals) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Shares,Comments,Author,Parent,Rank,IsSensitive,IsNsfw,IsDeleted,IsPinned,IsEdited,IsLiked,IsShared,IsCommented,IsSubscribed,IsBookmarked,IsReblogged,IsMentioned,IsPoll,IsPollVoted,IsPollExpired,IsPollClosed,IsPollMultiple,IsPollHideTotals) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 	`
 	statement, err := db.Prepare(str2)
 	if err != nil {
@@ -69,9 +66,6 @@ INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Share
 		p.Author,
 		p.Parent,
 		p.Rank,
-		p.Children[0],
-		p.Tags[0],
-		p.Mentions[0],
 		p.IsSensitive,
 		p.IsNsfw,
 		p.IsDeleted,
@@ -90,7 +84,7 @@ INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Share
 		p.IsPollClosed,
 		p.IsPollMultiple,
 		p.IsPollHideTotals,
-		p.IsPollHideTotals
+		p.IsPollHideTotals,
 	)
 	if err != nil {
 		panic(err)
