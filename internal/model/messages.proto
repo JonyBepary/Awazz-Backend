@@ -14,7 +14,7 @@ message Messages{
     google.protobuf.Timestamp delete_time = 7;
     bool status = 8 ;
     string attachment = 9 ;
-    string type = 10;
+    string types = 10;
     string reaction = 11;
 }
 
