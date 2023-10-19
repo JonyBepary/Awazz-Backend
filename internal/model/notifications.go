@@ -5,7 +5,7 @@ import (
 )
 
 func (n *Notifications) SaveNotifications() error {
-	db, err := durable.CreateDatabase("Database/notifications")
+	db, err := durable.CreateDatabase("Database/notifications.sqlite")
 	if err != nil {
 		return err
 	}

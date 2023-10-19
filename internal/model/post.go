@@ -5,7 +5,7 @@ import (
 )
 
 func (p *Post) SavePost() error {
-	db, err := durable.CreateDatabase("Database/post.sqlite")
+	db, err := durable.CreateDatabase("./Database/", p.FragmentationKey, "post.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -41,14 +41,16 @@ func (p *Post) SavePost() error {
 	    IsPollExpired bool,
 	    IsPollClosed bool,
 	    IsPollMultiple bool,
-	    IsPollHideTotals bool)
+	    IsPollHideTotals bool,
+		FragmentationKey VARCHAR(128))
 	`
 	_, err = db.Exec(str)
 	if err != nil {
 		panic(err)
 	}
 	str2 := `
-INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Shares,Comments,Author,Parent,Rank,IsSensitive,IsNsfw,IsDeleted,IsPinned,IsEdited,IsLiked,IsShared,IsCommented,IsSubscribed,IsBookmarked,IsReblogged,IsMentioned,IsPoll,IsPollVoted,IsPollExpired,IsPollClosed,IsPollMultiple,IsPollHideTotals) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+INSERT INTO Post (
+	Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Shares,Comments,Author,Parent,Rank,IsSensitive,IsNsfw,IsDeleted,IsPinned,IsEdited,IsLiked,IsShared,IsCommented,IsSubscribed,IsBookmarked,IsReblogged,IsMentioned,IsPoll,IsPollVoted,IsPollExpired,IsPollClosed,IsPollMultiple,IsPollHideTotals,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 	`
 	statement, err := db.Prepare(str2)
 	if err != nil {
@@ -85,6 +87,7 @@ INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Share
 		p.IsPollMultiple,
 		p.IsPollHideTotals,
 		p.IsPollHideTotals,
+		p.FragmentationKey,
 	)
 	if err != nil {
 		panic(err)
@@ -92,8 +95,7 @@ INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Share
 
 	return nil
 }
-
-/*func (p *Post) GetPost() error {
+func (p *Post) GetPost(postid string) error {
 	db,
 		err := durable.CreateDatabase("Database/post")
 	if err != nil {
@@ -102,7 +104,7 @@ INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Share
 	defer db.Close()
 	return nil
 }
-func (p *Post) UpdatePost() error {
+func (p *Post) UpdatePost(postid string) error {
 	db, err := durable.CreateDatabase("Database/Post")
 	if err != nil {
 		panic(err)
@@ -110,7 +112,7 @@ func (p *Post) UpdatePost() error {
 	defer db.Close()
 	return nil
 }
-func (p *Post) DeletePost() error {
+func (p *Post) DeletePost(postid string) error {
 	db, err := durable.CreateDatabase("Database/Post")
 	if err != nil {
 		panic(err)
@@ -118,4 +120,3 @@ func (p *Post) DeletePost() error {
 	defer db.Close()
 	return nil
 }
-*/
