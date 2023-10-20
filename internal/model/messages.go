@@ -116,21 +116,3 @@ func (u *Messages) UpdatedMessages(msgId string) error {
 
 	return nil
 }
-
-// func (d *Messages) DeletedMessages(msgId string) error {
-// 	db, err := durable.CreateDatabase("Database/messages")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer db.Close()
-	
-
-// 	_, err := statement.Exec("DELETE FROM Messages where msgId = ?", msgId)
-    
-// 	rows,_ := Database.Query()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	return nil
-// }
