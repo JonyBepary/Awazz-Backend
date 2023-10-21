@@ -14,7 +14,7 @@ package model;
 option go_package = ".;model";
 import "google/protobuf/timestamp.proto";
 
-message Comments{
+message Comment{
     string id = 1;
     string user = 2;
     string post_id = 3;
@@ -23,8 +23,13 @@ message Comments{
     google.protobuf.Timestamp created_date = 6 ;
     google.protobuf.Timestamp updated_date = 7 ;
     int64 likes = 8;
-    int64 replies = 9;
+    repeated string replies = 9;
     bool is_deleted = 10;
     bool is_updated = 11;
+}
+
+
+message Comments {
+    repeated Comment comments = 1;
 }
 
