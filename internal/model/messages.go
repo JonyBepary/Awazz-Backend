@@ -25,7 +25,7 @@ func (msg *Messages) SaveMessages() error {
 		LastEdit TEXT,
 		DeleteTime TEXT,
 		Status BOOL,
-		Attachment BLOB, 
+		Attachment BLOB,
 		Type TEXT,
 		Reaction TEXT)
 		`
@@ -40,7 +40,7 @@ func (msg *Messages) SaveMessages() error {
 		panic(err)
 	}
 
-	_, err = statement.Exec(msg.MsgId, msg.SenderId, msg.ReceiverId, msg.Content, msg.SentTime.String(), msg.LastEdit.String(), msg.DeleteTime.String(), msg.Status, msg.Type, msg.Reaction)
+	_, err = statement.Exec(msg.MsgId, msg.SenderId, msg.ReceiverId, msg.Content, msg.SentTime.String(), msg.LastEdit.String(), msg.DeleteTime.String(), msg.Status, msg.Types, msg.Reaction)
 	if err != nil {
 		panic(err)
 	}
@@ -64,7 +64,7 @@ func (m *Messages) GetMessages(msgId string) error {
 		SentTime := ""
 		LastEdit := ""
 		DeleteTime := ""
-		err = rows.Scan(&m.MsgId, &m.SenderId, &m.ReceiverId, &m.Content, &SentTime, &LastEdit, &DeleteTime, &m.Status, &m.Attachment, &m.Type, &m.Reaction)
+		err = rows.Scan(&m.MsgId, &m.SenderId, &m.ReceiverId, &m.Content, &SentTime, &LastEdit, &DeleteTime, &m.Status, &m.Attachment, &m.Types, &m.Reaction)
 
 		if err != nil {
 			log.Fatal(err)

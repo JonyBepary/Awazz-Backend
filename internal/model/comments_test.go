@@ -11,7 +11,7 @@ import (
 
 func TestComments_Save_Get(t *testing.T) {
 	// Create a new Comments object with some data
-	cm := &Comments{
+	cm := &Comment{
 
 		PostId: "1",
 		Id:     "2",
@@ -33,7 +33,7 @@ func TestComments_Save_Get(t *testing.T) {
 	}
 
 	// Unmarshal the data and check that it matches the original Comments object
-	var savedCm Comments
+	var savedCm Comment
 	err = proto.Unmarshal(data, &savedCm)
 	if err != nil {
 		panic(err)
@@ -45,9 +45,9 @@ func TestComments_Save_Get(t *testing.T) {
 
 func TestGetNComments(t *testing.T) {
 	// Create 10 Comments objects with different post IDs
-	var comments []*Comments
+	var comments []*Comment
 	for i := 1; i <= 10; i++ {
-		cm := &Comments{
+		cm := &Comment{
 			PostId: "1",
 			Id:     fmt.Sprint(i),
 			Text:   fmt.Sprintf("This is comment %d", i),

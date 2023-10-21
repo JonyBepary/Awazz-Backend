@@ -8,7 +8,7 @@ import (
 )
 
 // Comments is the database model for comments.
-func (cm *Comments) Get() error {
+func (cm *Comment) Get() error {
 	//leveldb get
 	db, err := leveldb.OpenFile("Database/comments", nil)
 	if err != nil {
@@ -26,7 +26,7 @@ func (cm *Comments) Get() error {
 	return nil
 }
 
-func (cm *Comments) Save() error {
+func (cm *Comment) Save() error {
 	//leveldb put
 	db, err := leveldb.OpenFile("Database/comments", nil)
 	if err != nil {
@@ -44,7 +44,7 @@ func (cm *Comments) Save() error {
 	return nil
 }
 
-func GetNComments(postId string, N int) ([]*Comments, error) {
+func GetNComments(postId string, N int) ([]*Comment, error) {
 	//leveldb get
 	db, err := leveldb.OpenFile("Database/comments", nil)
 	if err != nil {
@@ -53,9 +53,9 @@ func GetNComments(postId string, N int) ([]*Comments, error) {
 	defer db.Close()
 	iterator := db.NewIterator(nil, nil)
 	defer iterator.Release()
-	var comments []*Comments
+	var comments []*Comment
 	for iterator.Next() && len(comments) < N+1 {
-		var cm Comments
+		var cm Comment
 		err = proto.Unmarshal(iterator.Value(), &cm)
 		if err != nil {
 			return nil, err
