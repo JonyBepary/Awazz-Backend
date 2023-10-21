@@ -4,9 +4,10 @@ package model;
 option go_package = ".;model";
 import "google/protobuf/timestamp.proto";
 
-message Follows{
-    string follower_id= 1;
-    string followee_id= 2;
+
+
+message Follower{
+    repeated string User= 1;
     bool status = 3;
     google.protobuf.Timestamp time = 4 ;
 }
