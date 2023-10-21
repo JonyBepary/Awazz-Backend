@@ -40,6 +40,7 @@ message Person {
     string endpoints = 38;//no need
     repeated string streams = 39;
     string publicKey = 40;
+    string fragmentationKey = 41;
 }
 
 
@@ -50,6 +51,16 @@ message Account {
 	string phone = 4; //optional
 	google.protobuf.Timestamp created_at = 5;
 	google.protobuf.Timestamp updated_at = 6;
+}
+
+message UserPreview{
+    string id = 1;
+    string name = 2;
+    string icon = 5;
+    string url = 6;
+    string reactions = 7;
+    string publicKey = 13;
+    string fragmentationKey = 14;
 }
 
 // collection of Persons
