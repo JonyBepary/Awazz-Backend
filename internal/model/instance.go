@@ -9,26 +9,25 @@ func (p *Community) Create() error {
 		panic(err)
 	}
 	defer db.Close()
-	str := `
-	CREATE TABLE IF NOT EXISTS Community (
-		id VARCHAR(128) PRIMARY KEY,
-		instance_id VARCHAR(128),
-		name TEXT,
-		description TEXT,
-		icon TEXT,
-		cover TEXT,
-		created_at TIMESTAMP,
-		updated_at TIMESTAMP,
-		members BIGINT,
-		admins TEXT[],
-		moderators TEXT[],
-		post TEXT[]
-	);`
+	str := `CREATE TABLE IF NOT EXISTS COMMUNITY (
+	Id VARCHAR(255) PRIMARY KEY NOT NULL,
+	InstanceId VARCHAR(255),
+	Name VARCHAR(255),
+	Description VARCHAR(255),
+	Icon VARCHAR(255),
+	Cover VARCHAR(255),
+	CreatedAt BIGINT,
+	UpdatedAt BIGINT,
+	Members BIGINT,
+	Admins VARCHAR(255),
+	Moderators VARCHAR(255),
+	Post VARCHAR(255)
+)`
 	_, err = db.Exec(str)
 	if err != nil {
 		panic(err)
 	}
-	statement, err := db.Prepare("INSERT INTO Community (id, instance_id, name, description, icon, cover, created_at, updated_at, members, admins, moderators, post) VALUES ( ?,  ?,  ?,  ?,  ?,  ?,  ?,  ?,  ?,  ?,  ?,  ?)")
+	statement, err := db.Prepare("INSERT INTO COMMUNITY (Id,InstanceId,Name,Description,Icon,Cover,CreatedAt,UpdatedAt,Members,Admins,Moderators,Post) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		panic(err)
 	}
@@ -38,6 +37,38 @@ func (p *Community) Create() error {
 	}
 	return nil
 }
+
+func (p *Community) GetCommunity(cid string) error {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// spew.Dump(rows)
+	//! fmt.Println("message id is: ", pid)
+	row, err := db.Query("SELECT * FROM COMMUNITY WHERE Id=?", cid)
+	if err != nil {
+		panic(err)
+	}
+
+	row.Next()
+	err = row.Scan(&p.Id, &p.InstanceId, &p.Name, &p.Description, &p.Icon, &p.Cover, &p.CreatedAt, &p.UpdatedAt, &p.Members, &p.Admins, &p.Moderators, &p.Post)
+	if err != nil {
+		panic(err)
+	}
+
+	err = row.Err()
+	if err != nil {
+		panic(err)
+	}
+	row.Close()
+
+	//! spew.Dump(p.Id)
+	return nil
+}
+
+
 func (p *Instance) Create() error {
 
 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
