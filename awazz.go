@@ -72,10 +72,41 @@ func savePerson(c *gin.Context) {
 }
 
 func main() {
-	r := gin.Default()
-	r.GET("/post", getPost)
-	r.POST("/post", savePost)
-	r.GET("/person", getPerson)
-	r.POST("/person", savePerson)
-	r.Run(":9091")
+	p := model.Post{
+		Id:               "12345",
+		Community:        "Tech Enthusiasts",
+		Content:          "This is a sample post content.",
+		CreatedAt:        1666608000,
+		UpdatedAt:        1666612200,
+		DeletedAt:        0,
+		Likes:            50,
+		Shares:           10,
+		Comments:         25,
+		Author:           "JohnDoe123",
+		Parent:           "",
+		Rank:             7,
+		Children:         "",
+		Tags:             "technology, programming, sample",
+		Mentions:         "JaneSmith, TechGuru",
+		IsSensitive:      false,
+		IsNsfw:           false,
+		IsDeleted:        false,
+		IsPinned:         false,
+		IsEdited:         false,
+		IsLiked:          true,
+		IsShared:         false,
+		IsCommented:      true,
+		IsSubscribed:     true,
+		IsBookmarked:     true,
+		IsReblogged:      false,
+		IsMentioned:      true,
+		IsPoll:           true,
+		IsPollVoted:      true,
+		IsPollExpired:    false,
+		IsPollClosed:     false,
+		IsPollMultiple:   true,
+		IsPollHideTotals: false,
+	}
+	p.SavePost()
+
 }

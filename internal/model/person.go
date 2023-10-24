@@ -5,7 +5,7 @@ import (
 )
 
 func (p *Person) SavePerson() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (p *Person) SavePerson() error {
 }
 
 func (p *Person) GetPerson(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -91,7 +91,7 @@ func (p *Person) GetPerson(msgId string) error {
 }
 
 func GetPerson(msgId string) (Person, error) {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
