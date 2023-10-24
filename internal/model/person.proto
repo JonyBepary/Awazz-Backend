@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package model;
 option go_package = ".;model";
-import "google/protobuf/timestamp.proto";
+// import "google/protobuf/timestamp.proto";
 
 
 message Person {
@@ -11,24 +11,24 @@ message Person {
     string attributedTo = 5;
     string context = 8;
     string mediaType = 9;
-    google.protobuf.Timestamp endTime = 10;
+    int64 endTime = 10;
     string generator = 11;
     string icon = 12;
     string image = 13;
     string inReplyTo = 14;
     string location = 15;
     string preview = 16;
-    google.protobuf.Timestamp published = 17;
+    int64 publishedTime = 17;
     string replies = 18;
-    google.protobuf.Timestamp startTime = 19;
+    int64 startTime = 19;
     string summary = 20;
-    repeated string tag = 21;
-    google.protobuf.Timestamp updated = 22;
+    string tag = 21;
+    int64 updatedTime = 22;
     string url = 23;
-    repeated string to = 24;
-    repeated string bto = 25;
-    repeated string cc = 26;
-    repeated string bcc = 27;
+    string too = 24;
+    string bto = 25;
+    string cc = 26;
+    string bcc = 27;
     string likes = 29;
     string shares = 30;
     string inbox = 32;
@@ -38,7 +38,7 @@ message Person {
     string liked = 36;
     string preferredUsername = 37;
     string endpoints = 38;//no need
-    repeated string streams = 39;
+    string streams = 39;
     string publicKey = 40;
     string fragmentationKey = 41;
 }
@@ -49,8 +49,8 @@ message Account {
 	string password = 2;
 	string email = 3; //optional
 	string phone = 4; //optional
-	google.protobuf.Timestamp created_at = 5;
-	google.protobuf.Timestamp updated_at = 6;
+	int64 created_Time = 5;
+	int64 updated_Time = 6;
 }
 
 message UserPreview{
