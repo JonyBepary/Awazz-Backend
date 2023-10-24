@@ -1,93 +1,120 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
-	"github.com/SohelAhmedJoni/Awazz-Backend/pkg"
 )
 
-var column []string = []string{
-	"Id",
-	"Attachment",
-	"AttributedTo",
-	"Context",
-	"MediaType",
-	"EndTime",
-	"Generator",
-	"Icon",
-	"Image",
-	"InReplyTo",
-	"Location",
-	"Preview",
-	"Published",
-	"Replies",
-	"StartTime",
-	"Summary",
-	"Tag",
-	"Updated",
-	"Url",
-	"Likes",
-	"Shares",
-	"Inbox",
-	"Outbox",
-	"Following",
-	"Followers",
-	"Liked",
-	"PreferredUsername",
-	"Endpoints",
-	"Streams",
-	"PublicKey"}
-var column_type []string = []string{
-	"INTEGER PRIMARY KEY",
-	"BLOB",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"BLOB",
-	"BLOB",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"TEXT",
-	"INTEGER",
-	"TEXT",
-	"BLOB",
-	"BLOB"}
-
 func (p *Person) SavePerson() error {
-	db, err := durable.CreateDatabase("./Database/persons.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		return err
 	}
 	defer db.Close()
-
-	_, err = db.Exec(fmt.Sprintf("CREATE TABLE IF NOT EXISTS PERSON ( %v)", durable.SetColumn(column, column_type)))
+	sql_cmd := `CREATE TABLE IF NOT EXISTS PERSON (
+	Id VARCHAR(255) PRIMARY KEY,
+	Attachment VARCHAR(255),
+	AttributedTo VARCHAR(255),
+	Context VARCHAR(255),
+	MediaType VARCHAR(255),
+	EndTime INTEGER,
+	Generator VARCHAR(255),
+	Icon VARCHAR(255),
+	Image VARCHAR(255),
+	InReplyTo VARCHAR(255),
+	Location VARCHAR(255),
+	Preview VARCHAR(255),
+	PublishedTime INTEGER,
+	Replies VARCHAR(255),
+	StartTime INTEGER,
+	Summary VARCHAR(255),
+	Tag VARCHAR(255),
+	UpdatedTime INTEGER,
+	Url VARCHAR(255),
+	Too VARCHAR(255),
+	Bto VARCHAR(255),
+	Cc VARCHAR(255),
+	Bcc VARCHAR(255),
+	Likes VARCHAR(255),
+	Shares VARCHAR(255),
+	Inbox VARCHAR(255),
+	Outbox VARCHAR(255),
+	Following VARCHAR(255),
+	Followers VARCHAR(255),
+	Liked VARCHAR(255),
+	PreferredUsername VARCHAR(255),
+	Endpoints VARCHAR(255),
+	Streams VARCHAR(255),
+	PublicKey VARCHAR(255),
+	FragmentationKey VARCHAR(255)
+)`
+	_, err = db.Exec(sql_cmd)
 	if err != nil {
 		return err
 	}
-	statement, err := db.Prepare("INSERT INTO PERSON (Id,AttributedTo,Context,MediaType,EndTime,Generator,InReplyTo,Location,Preview,Published,Replies,StartTime,Summary,Tag,Updated,Url,Likes,Shares,Inbox,Outbox,Following,Followers,Liked,PreferredUsername,Endpoints) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? )")
+	statement, err := db.Prepare("INSERT INTO PERSON (Id,Attachment,AttributedTo,Context,MediaType,EndTime,Generator,Icon,Image,InReplyTo,Location,Preview,PublishedTime,Replies,StartTime,Summary,Tag,UpdatedTime,Url,Too,Bto,Cc,Bcc,Likes,Shares,Inbox,Outbox,Following,Followers,Liked,PreferredUsername,Endpoints,Streams,PublicKey,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		return err
 	}
-	_, err = statement.Exec(p.Id, pkg.ReadFile(p.Attachment), p.AttributedTo, p.Context, p.MediaType, p.EndTime.String(), p.Generator, pkg.ReadFile(p.Icon), pkg.ReadFile(p.Image), p.InReplyTo, p.Location, p.Preview, p.Published.String(), p.Replies, p.StartTime.String(), p.Summary, p.Tag[0], p.Updated.String(), p.Url, p.To[0], p.Bto[0], p.Cc[0], p.Bcc[0], p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams[0], p.PublicKey)
+	_, err = statement.Exec(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.Replies, p.StartTime, p.Summary, p.Tag, p.UpdatedTime, p.Url, p.Too, p.Bto, p.Cc, p.Bcc, p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams, p.PublicKey, p.FragmentationKey)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (p *Person) GetPerson(msgId string) error {
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// spew.Dump(rows)
+	rows, err := db.Query("SELECT * FROM PERSON")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.Replies, p.StartTime, p.Summary, p.Tag, p.UpdatedTime, p.Url, p.Too, p.Bto, p.Cc, p.Bcc, p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams, p.PublicKey, p.FragmentationKey)
+		if err != nil {
+			panic(err)
+		}
+	}
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
+}
+
+func GetPerson(msgId string) (Person, error) {
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// spew.Dump(rows)
+	//! fmt.Println("message id is: ", msgId)
+	row, err := db.Query("SELECT * FROM PERSON WHERE Id=?", msgId)
+	if err != nil {
+		panic(err)
+	}
+	p := Person{}
+	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.Tag, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
+	if err != nil {
+		panic(err)
+	}
+
+	err = row.Err()
+	if err != nil {
+		panic(err)
+	}
+	row.Close()
+
+	//! spew.Dump(p.Id)
+	return p, nil
 }
