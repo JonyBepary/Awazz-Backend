@@ -2,13 +2,28 @@ syntax = "proto3";
 
 package model;
 option go_package = ".;model";
-import "google/protobuf/timestamp.proto";
 
 
-
-message Follower{
-    repeated string User= 1;
-    bool status = 3;
-    google.protobuf.Timestamp time = 4 ;
+message Follow{
+    string followerId = 1;
+    string followeeId = 2;
+    int64 followTime = 3;
+    bool Isfollowing = 4;
 }
 
+message Follower{
+    string UserId= 1;
+    bool Status = 2;
+    int64 Time = 3 ;
+    string FollowAccount = 4;
+    string unfollowAccount =5;
+    
+}
+
+message Followee{
+    string UserId = 1;
+
+    string BlockAccountLink = 2; 
+    string BlockAccountName =3;
+    int64 Time = 4;
+}
