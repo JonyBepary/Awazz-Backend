@@ -4,7 +4,7 @@ import "github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 
 func (p *Community) CreateInstance() error {
 
-	db, err := durable.CreateDatabase("./Database/", "common.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}

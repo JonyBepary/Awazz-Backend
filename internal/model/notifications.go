@@ -5,7 +5,8 @@ import (
 )
 
 func (n *Notifications) SaveNotifications() error {
-	db, err := durable.CreateDatabase("Database/notifications.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ INSERT INTO Messages (Title,Body,Source,Image,Sound,Time,Channel,PriorityLevel,R
 }
 
 /*func (n *Notifications) GetNotifications() error {
-	db, err := durable.CreateDatabase("Database/notifications")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		return err
 	}
@@ -51,7 +52,7 @@ INSERT INTO Messages (Title,Body,Source,Image,Sound,Time,Channel,PriorityLevel,R
 	return nil
 }
 func (n *Notifications) UpdateNotifications() error {
-	db, err := durable.CreateDatabase("Database/notifications")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		return err
 	}
@@ -59,7 +60,7 @@ func (n *Notifications) UpdateNotifications() error {
 	return nil
 }
 func (n *Notifications) DeleteNotifications() error {
-	db, err := durable.CreateDatabase("Database/notifications")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		return err
 	}

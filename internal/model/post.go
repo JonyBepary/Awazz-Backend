@@ -5,7 +5,7 @@ import (
 )
 
 func (p *Post) SavePost() error {
-	db, err := durable.CreateDatabase("./Database/", p.FragmentationKey, "post.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -96,8 +96,8 @@ INSERT INTO Post (
 	return nil
 }
 func (p *Post) GetPost(postid string) error {
-	db,
-		err := durable.CreateDatabase("Database/post")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+
 	if err != nil {
 		panic(err)
 	}
@@ -105,7 +105,7 @@ func (p *Post) GetPost(postid string) error {
 	return nil
 }
 func (p *Post) UpdatePost(postid string) error {
-	db, err := durable.CreateDatabase("Database/Post")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -113,7 +113,7 @@ func (p *Post) UpdatePost(postid string) error {
 	return nil
 }
 func (p *Post) DeletePost(postid string) error {
-	db, err := durable.CreateDatabase("Database/Post")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
