@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package model;
 option go_package = ".;model";
-import "google/protobuf/timestamp.proto";
+// import "google/protobuf/timestamp.proto";
 
 message Notifications{
     string title= 1;
@@ -10,11 +10,11 @@ message Notifications{
     string source = 3;
     string image = 4;
     string sound= 5 ;
-    google.protobuf.Timestamp time = 6 ;
+    int64 time = 6 ;
     string channel = 7;
     int64 priority_level = 8;
     bool readStatus = 9;
-    google.protobuf.Timestamp created = 10;
+    int64 created = 10;
 
 }
 

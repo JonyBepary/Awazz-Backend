@@ -3,7 +3,7 @@ syntax = "proto3";
 package model;
 option go_package = ".;model";
 
-import "google/protobuf/timestamp.proto";
+// import "google/protobuf/timestamp.proto";
 
 // Post represents a post in a social media platform.
 message Post {
@@ -17,13 +17,13 @@ message Post {
   string content = 3;
 
   // Timestamp when the post was created.
-  google.protobuf.Timestamp created_at = 4;
+  int64 created_at = 4;
 
   // Timestamp when the post was last updated.
-  google.protobuf.Timestamp updated_at = 5;
+  int64 updated_at = 5;
 
   // Timestamp when the post was deleted.
-  google.protobuf.Timestamp deleted_at = 6;
+  int64 deleted_at = 6;
 
   // Number of likes the post has received.
   int64 likes = 7;
@@ -44,13 +44,13 @@ message Post {
   int64 rank = 12;
 
   // Child posts of the current post.
-  repeated string children = 13;
+  string children = 13;
 
   // Tags associated with the post.
-  repeated string tags = 14;
+  string tags = 14;
 
   // Users mentioned in the post.
-  repeated string mentions = 15;
+  string mentions = 15;
 
   // Indicates if the post is sensitive.
   bool is_sensitive = 16;

@@ -1,6 +1,10 @@
 package model
 
 import (
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 )
 
@@ -15,14 +19,14 @@ func (n *Notifications) SaveNotifications() error {
 	CREATE TABLE IF NOT EXISTS Messages (
 	Title VARCHAR(128),
     Body VARCHAR(128),
-    Source VARCHAR(128),
+    Source VARCHAR(128) PRIMARY KEY,
     Image VARCHAR(128),
     Sound VARCHAR(128),
-    Time TIMESTAMP,
+    Time INTEGER,
     Channel VARCHAR(128),
-    PriorityLevel INT,
+    PriorityLevel INTEGER,
     ReadStatus bool,
-    Created TIMESTAMP)
+    Created INTEGER)
 	`
 	_, err = db.Exec(str)
 	if err != nil {
@@ -43,28 +47,65 @@ INSERT INTO Messages (Title,Body,Source,Image,Sound,Time,Channel,PriorityLevel,R
 	return nil
 }
 
-/*func (n *Notifications) GetNotifications() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (n *Notifications) GetNotifications(msgId string) error {
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
-		return err
+		panic(err)
 	}
 	defer db.Close()
+
+	rows, err := db.Query(fmt.Sprintf("select * from Notifications where msgId = %v", msgId))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&n.Title, &n.Body, &n.Source, &n.Image, &n.Sound, &n.Time, &n.Channel, &n.PriorityLevel, &n.ReadStatus, &n.Created)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	err = rows.Err()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return nil
 }
-func (n *Notifications) UpdateNotifications() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+
+func (u *Notifications) UpdateNotifications(Title, Body, Source string) error {
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
-		return err
+		panic(err)
 	}
 	defer db.Close()
+	u.Time = time.Now().Unix()
+	u.Title = Title
+	u.Body = Body
+	u.Source = Source
+	_, err = db.Exec("UPDATE Notification SET  Time= ?, Title = ?, Body = ? WHERE Source = ? ", u.Time, u.Title, u.Body, u.Source)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return nil
 }
-func (n *Notifications) DeleteNotifications() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (d *Notifications) DeleteNotifications(Source string) error {
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
-		return err
+		panic(err)
 	}
 	defer db.Close()
+
+	_, err = db.Exec("DELETE FROM  Notifications WHERE  Source= ?", Source)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 	return nil
 }
-*/
