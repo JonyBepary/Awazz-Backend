@@ -19,7 +19,7 @@ func (msg *Messages) SaveMessages() error {
 		MsgId VARCHAR(128) PRIMARY KEY,
 		SenderId  VARCHAR(128),
 		ReceiverId  VARCHAR(128),
-		Content INTEGER,
+		Content TEXT,
 		SentTime INTEGER,
 		LastEdit INTEGER,
 		DeleteTime TEXT,
