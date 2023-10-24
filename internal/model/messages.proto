@@ -16,6 +16,3 @@ message Messages{
     string types  = 10;
     string reaction  = 11;
 }
-
-
-
