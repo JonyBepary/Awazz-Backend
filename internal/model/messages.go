@@ -9,7 +9,7 @@ import (
 )
 
 func (msg *Messages) SaveMessages() error {
-	db, err := durable.CreateDatabase("./Database/", "common", "message.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +47,7 @@ func (msg *Messages) SaveMessages() error {
 }
 
 func (m *Messages) GetMessages(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "message.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func (m *Messages) GetMessages(msgId string) error {
 }
 
 func (u *Messages) UpdatedMessages(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "message.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -93,7 +93,7 @@ func (u *Messages) UpdatedMessages(msgId string) error {
 }
 
 func (d *Messages) DeleteMessages(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "message.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
