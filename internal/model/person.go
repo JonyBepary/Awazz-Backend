@@ -103,7 +103,7 @@ func GetPerson(msgId string) (Person, error) {
 	if err != nil {
 		panic(err)
 	}
-	p := Person{}
+	row.Next()
 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.Tag, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
 	if err != nil {
 		panic(err)
@@ -116,5 +116,35 @@ func GetPerson(msgId string) (Person, error) {
 	row.Close()
 
 	//! spew.Dump(p.Id)
-	return p, nil
+	return nil
 }
+
+// func GetPerson(msgId string) (Person, error) {
+// 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer db.Close()
+
+// 	// spew.Dump(rows)
+// 	//! fmt.Println("message id is: ", msgId)
+// 	row, err := db.Query("SELECT * FROM PERSON WHERE Id=?", msgId)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	p := Person{}
+// 	row.Next()
+// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.Tag, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	err = row.Err()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	row.Close()
+
+// 	//! spew.Dump(p.Id)
+// 	return p, nil
+// }

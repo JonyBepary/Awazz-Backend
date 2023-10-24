@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package model;
 option go_package = ".;model";
-import "google/protobuf/timestamp.proto";
-
 // Community represents a single community.
 message Community {
   // Unique identifier for the user
@@ -25,10 +23,10 @@ message Community {
   string cover = 6;
 
   // Timestamp when the user was created
-  google.protobuf.Timestamp created_at = 7;
+  int64 created_at = 7;
 
   // Timestamp when the user was last updated
-  google.protobuf.Timestamp updated_at = 8;
+  int64 updated_at = 8;
 
   // Number of members in the user's group
   int64 members = 9;
@@ -57,15 +55,15 @@ message Instance {
     // List of community IDs associated with the instance.
     repeated string community_ids = 8;
     // Timestamp when the instance was created.
-    google.protobuf.Timestamp created_at = 9;
+    int64 created_at = 9;
     // Updater of the instance.
     string updated_by = 10;
     // Timestamp when the instance was last updated.
-    google.protobuf.Timestamp updated_at = 11;
+    int64 updated_at = 11;
     // Deleter of the instance.
     string deleted_by = 12;
     // Timestamp when the instance was deleted.
-    google.protobuf.Timestamp deleted_at = 13;
+    int64 deleted_at = 13;
     // List of tags associated with the instance.
     repeated string tags = 14;
     // List of labels associated with the instance.
