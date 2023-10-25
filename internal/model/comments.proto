@@ -12,20 +12,20 @@ syntax = "proto3";
 
 package model;
 option go_package = ".;model";
-import "google/protobuf/timestamp.proto";
 
 message Comment{
     string id = 1;
     string user = 2;
     string post_id = 3;
     string user_id = 4;
-    string text = 5 ;
-    google.protobuf.Timestamp created_date = 6 ;
-    google.protobuf.Timestamp updated_date = 7 ;
-    int64 likes = 8;
-    repeated string replies = 9;
-    bool is_deleted = 10;
-    bool is_updated = 11;
+    string replied_to = 5;
+    string text = 6 ;
+    int64 created_date = 7 ;
+    int64 updated_date = 8 ;
+    int64 likes = 9;
+    repeated string replies = 10;
+    bool is_deleted = 11;
+    bool is_updated = 12;
 }
 
 

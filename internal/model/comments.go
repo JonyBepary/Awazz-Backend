@@ -3,14 +3,14 @@ package model
 import (
 	"fmt"
 
-	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 	"google.golang.org/protobuf/proto"
 )
 
 // Comments is the database model for comments.
 func (cm *Comment) Get() error {
 	//leveldb get
-	db, err := leveldb.OpenFile("Database/comments", nil)
+	db, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (cm *Comment) Get() error {
 
 func (cm *Comment) Save() error {
 	//leveldb put
-	db, err := leveldb.OpenFile("Database/comments", nil)
+	db, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (cm *Comment) Save() error {
 
 func GetNComments(postId string, N int) ([]*Comment, error) {
 	//leveldb get
-	db, err := leveldb.OpenFile("Database/comments", nil)
+	db, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		return nil, err
 	}
