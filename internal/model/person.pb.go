@@ -25,41 +25,41 @@ type Person struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id                string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Attachment        string `protobuf:"bytes,4,opt,name=attachment,proto3" json:"attachment,omitempty"`
-	AttributedTo      string `protobuf:"bytes,5,opt,name=attributedTo,proto3" json:"attributedTo,omitempty"`
-	Context           string `protobuf:"bytes,8,opt,name=context,proto3" json:"context,omitempty"`
-	MediaType         string `protobuf:"bytes,9,opt,name=mediaType,proto3" json:"mediaType,omitempty"`
-	EndTime           int64  `protobuf:"varint,10,opt,name=endTime,proto3" json:"endTime,omitempty"`
-	Generator         string `protobuf:"bytes,11,opt,name=generator,proto3" json:"generator,omitempty"`
-	Icon              string `protobuf:"bytes,12,opt,name=icon,proto3" json:"icon,omitempty"`
-	Image             string `protobuf:"bytes,13,opt,name=image,proto3" json:"image,omitempty"`
-	InReplyTo         string `protobuf:"bytes,14,opt,name=inReplyTo,proto3" json:"inReplyTo,omitempty"`
-	Location          string `protobuf:"bytes,15,opt,name=location,proto3" json:"location,omitempty"`
-	Preview           string `protobuf:"bytes,16,opt,name=preview,proto3" json:"preview,omitempty"`
-	PublishedTime     int64  `protobuf:"varint,17,opt,name=publishedTime,proto3" json:"publishedTime,omitempty"`
-	Replies           string `protobuf:"bytes,18,opt,name=replies,proto3" json:"replies,omitempty"`
-	StartTime         int64  `protobuf:"varint,19,opt,name=startTime,proto3" json:"startTime,omitempty"`
-	Summary           string `protobuf:"bytes,20,opt,name=summary,proto3" json:"summary,omitempty"`
-	Tag               string `protobuf:"bytes,21,opt,name=tag,proto3" json:"tag,omitempty"`
-	UpdatedTime       int64  `protobuf:"varint,22,opt,name=updatedTime,proto3" json:"updatedTime,omitempty"`
-	Url               string `protobuf:"bytes,23,opt,name=url,proto3" json:"url,omitempty"`
-	Too               string `protobuf:"bytes,24,opt,name=too,proto3" json:"too,omitempty"`
-	Bto               string `protobuf:"bytes,25,opt,name=bto,proto3" json:"bto,omitempty"`
-	Cc                string `protobuf:"bytes,26,opt,name=cc,proto3" json:"cc,omitempty"`
-	Bcc               string `protobuf:"bytes,27,opt,name=bcc,proto3" json:"bcc,omitempty"`
-	Likes             string `protobuf:"bytes,29,opt,name=likes,proto3" json:"likes,omitempty"`
-	Shares            string `protobuf:"bytes,30,opt,name=shares,proto3" json:"shares,omitempty"`
-	Inbox             string `protobuf:"bytes,32,opt,name=inbox,proto3" json:"inbox,omitempty"`
-	Outbox            string `protobuf:"bytes,33,opt,name=outbox,proto3" json:"outbox,omitempty"`
-	Following         string `protobuf:"bytes,34,opt,name=following,proto3" json:"following,omitempty"`
-	Followers         string `protobuf:"bytes,35,opt,name=followers,proto3" json:"followers,omitempty"`
-	Liked             string `protobuf:"bytes,36,opt,name=liked,proto3" json:"liked,omitempty"`
-	PreferredUsername string `protobuf:"bytes,37,opt,name=preferredUsername,proto3" json:"preferredUsername,omitempty"`
-	Endpoints         string `protobuf:"bytes,38,opt,name=endpoints,proto3" json:"endpoints,omitempty"` //no need
-	Streams           string `protobuf:"bytes,39,opt,name=streams,proto3" json:"streams,omitempty"`
-	PublicKey         string `protobuf:"bytes,40,opt,name=publicKey,proto3" json:"publicKey,omitempty"`
-	FragmentationKey  string `protobuf:"bytes,41,opt,name=fragmentationKey,proto3" json:"fragmentationKey,omitempty"`
+	Id                string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Attachment        string   `protobuf:"bytes,4,opt,name=attachment,proto3" json:"attachment,omitempty"`
+	AttributedTo      string   `protobuf:"bytes,5,opt,name=attributedTo,proto3" json:"attributedTo,omitempty"`
+	Context           string   `protobuf:"bytes,8,opt,name=context,proto3" json:"context,omitempty"`
+	MediaType         string   `protobuf:"bytes,9,opt,name=mediaType,proto3" json:"mediaType,omitempty"`
+	EndTime           int64    `protobuf:"varint,10,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	Generator         string   `protobuf:"bytes,11,opt,name=generator,proto3" json:"generator,omitempty"`
+	Icon              string   `protobuf:"bytes,12,opt,name=icon,proto3" json:"icon,omitempty"`
+	Image             string   `protobuf:"bytes,13,opt,name=image,proto3" json:"image,omitempty"`
+	InReplyTo         string   `protobuf:"bytes,14,opt,name=inReplyTo,proto3" json:"inReplyTo,omitempty"`
+	Location          string   `protobuf:"bytes,15,opt,name=location,proto3" json:"location,omitempty"`
+	Preview           string   `protobuf:"bytes,16,opt,name=preview,proto3" json:"preview,omitempty"`
+	PublishedTime     int64    `protobuf:"varint,17,opt,name=publishedTime,proto3" json:"publishedTime,omitempty"`
+	Replies           []string `protobuf:"bytes,18,rep,name=replies,proto3" json:"replies,omitempty"`
+	StartTime         int64    `protobuf:"varint,19,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	Summary           string   `protobuf:"bytes,20,opt,name=summary,proto3" json:"summary,omitempty"`
+	Tag               []string `protobuf:"bytes,21,rep,name=tag,proto3" json:"tag,omitempty"`
+	UpdatedTime       int64    `protobuf:"varint,22,opt,name=updatedTime,proto3" json:"updatedTime,omitempty"`
+	Url               []string `protobuf:"bytes,23,rep,name=url,proto3" json:"url,omitempty"`
+	Too               []string `protobuf:"bytes,24,rep,name=too,proto3" json:"too,omitempty"`
+	Bto               []string `protobuf:"bytes,25,rep,name=bto,proto3" json:"bto,omitempty"`
+	Cc                []string `protobuf:"bytes,26,rep,name=cc,proto3" json:"cc,omitempty"`
+	Bcc               []string `protobuf:"bytes,27,rep,name=bcc,proto3" json:"bcc,omitempty"`
+	Likes             string   `protobuf:"bytes,29,opt,name=likes,proto3" json:"likes,omitempty"`
+	Shares            string   `protobuf:"bytes,30,opt,name=shares,proto3" json:"shares,omitempty"`
+	Inbox             string   `protobuf:"bytes,32,opt,name=inbox,proto3" json:"inbox,omitempty"`
+	Outbox            string   `protobuf:"bytes,33,opt,name=outbox,proto3" json:"outbox,omitempty"`
+	Following         []string `protobuf:"bytes,34,rep,name=following,proto3" json:"following,omitempty"`
+	Followers         []string `protobuf:"bytes,35,rep,name=followers,proto3" json:"followers,omitempty"`
+	Liked             []string `protobuf:"bytes,36,rep,name=liked,proto3" json:"liked,omitempty"`
+	PreferredUsername string   `protobuf:"bytes,37,opt,name=preferredUsername,proto3" json:"preferredUsername,omitempty"`
+	Endpoints         string   `protobuf:"bytes,38,opt,name=endpoints,proto3" json:"endpoints,omitempty"` //no need
+	Streams           string   `protobuf:"bytes,39,opt,name=streams,proto3" json:"streams,omitempty"`
+	PublicKey         string   `protobuf:"bytes,40,opt,name=publicKey,proto3" json:"publicKey,omitempty"`
+	FragmentationKey  string   `protobuf:"bytes,41,opt,name=fragmentationKey,proto3" json:"fragmentationKey,omitempty"`
 }
 
 func (x *Person) Reset() {
@@ -185,11 +185,11 @@ func (x *Person) GetPublishedTime() int64 {
 	return 0
 }
 
-func (x *Person) GetReplies() string {
+func (x *Person) GetReplies() []string {
 	if x != nil {
 		return x.Replies
 	}
-	return ""
+	return nil
 }
 
 func (x *Person) GetStartTime() int64 {
@@ -206,11 +206,11 @@ func (x *Person) GetSummary() string {
 	return ""
 }
 
-func (x *Person) GetTag() string {
+func (x *Person) GetTag() []string {
 	if x != nil {
 		return x.Tag
 	}
-	return ""
+	return nil
 }
 
 func (x *Person) GetUpdatedTime() int64 {
@@ -220,39 +220,39 @@ func (x *Person) GetUpdatedTime() int64 {
 	return 0
 }
 
-func (x *Person) GetUrl() string {
+func (x *Person) GetUrl() []string {
 	if x != nil {
 		return x.Url
 	}
-	return ""
+	return nil
 }
 
-func (x *Person) GetToo() string {
+func (x *Person) GetToo() []string {
 	if x != nil {
 		return x.Too
 	}
-	return ""
+	return nil
 }
 
-func (x *Person) GetBto() string {
+func (x *Person) GetBto() []string {
 	if x != nil {
 		return x.Bto
 	}
-	return ""
+	return nil
 }
 
-func (x *Person) GetCc() string {
+func (x *Person) GetCc() []string {
 	if x != nil {
 		return x.Cc
 	}
-	return ""
+	return nil
 }
 
-func (x *Person) GetBcc() string {
+func (x *Person) GetBcc() []string {
 	if x != nil {
 		return x.Bcc
 	}
-	return ""
+	return nil
 }
 
 func (x *Person) GetLikes() string {
@@ -283,25 +283,25 @@ func (x *Person) GetOutbox() string {
 	return ""
 }
 
-func (x *Person) GetFollowing() string {
+func (x *Person) GetFollowing() []string {
 	if x != nil {
 		return x.Following
 	}
-	return ""
+	return nil
 }
 
-func (x *Person) GetFollowers() string {
+func (x *Person) GetFollowers() []string {
 	if x != nil {
 		return x.Followers
 	}
-	return ""
+	return nil
 }
 
-func (x *Person) GetLiked() string {
+func (x *Person) GetLiked() []string {
 	if x != nil {
 		return x.Liked
 	}
-	return ""
+	return nil
 }
 
 func (x *Person) GetPreferredUsername() string {
@@ -645,19 +645,19 @@ var file_person_proto_rawDesc = []byte{
 	0x65, 0x77, 0x12, 0x24, 0x0a, 0x0d, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x73, 0x68, 0x65, 0x64, 0x54,
 	0x69, 0x6d, 0x65, 0x18, 0x11, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0d, 0x70, 0x75, 0x62, 0x6c, 0x69,
 	0x73, 0x68, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x70, 0x6c,
-	0x69, 0x65, 0x73, 0x18, 0x12, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x70, 0x6c, 0x69,
+	0x69, 0x65, 0x73, 0x18, 0x12, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x70, 0x6c, 0x69,
 	0x65, 0x73, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x18,
 	0x13, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65,
 	0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x18, 0x14, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x07, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x74, 0x61,
-	0x67, 0x18, 0x15, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x74, 0x61, 0x67, 0x12, 0x20, 0x0a, 0x0b,
+	0x67, 0x18, 0x15, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x74, 0x61, 0x67, 0x12, 0x20, 0x0a, 0x0b,
 	0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x16, 0x20, 0x01, 0x28,
 	0x03, 0x52, 0x0b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x10,
-	0x0a, 0x03, 0x75, 0x72, 0x6c, 0x18, 0x17, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c,
-	0x12, 0x10, 0x0a, 0x03, 0x74, 0x6f, 0x6f, 0x18, 0x18, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x74,
-	0x6f, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x62, 0x74, 0x6f, 0x18, 0x19, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x03, 0x62, 0x74, 0x6f, 0x12, 0x0e, 0x0a, 0x02, 0x63, 0x63, 0x18, 0x1a, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x02, 0x63, 0x63, 0x12, 0x10, 0x0a, 0x03, 0x62, 0x63, 0x63, 0x18, 0x1b, 0x20, 0x01, 0x28,
+	0x0a, 0x03, 0x75, 0x72, 0x6c, 0x18, 0x17, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c,
+	0x12, 0x10, 0x0a, 0x03, 0x74, 0x6f, 0x6f, 0x18, 0x18, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x74,
+	0x6f, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x62, 0x74, 0x6f, 0x18, 0x19, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x03, 0x62, 0x74, 0x6f, 0x12, 0x0e, 0x0a, 0x02, 0x63, 0x63, 0x18, 0x1a, 0x20, 0x03, 0x28, 0x09,
+	0x52, 0x02, 0x63, 0x63, 0x12, 0x10, 0x0a, 0x03, 0x62, 0x63, 0x63, 0x18, 0x1b, 0x20, 0x03, 0x28,
 	0x09, 0x52, 0x03, 0x62, 0x63, 0x63, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x73, 0x18,
 	0x1d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x73, 0x12, 0x16, 0x0a, 0x06,
 	0x73, 0x68, 0x61, 0x72, 0x65, 0x73, 0x18, 0x1e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x68,
@@ -665,10 +665,10 @@ var file_person_proto_rawDesc = []byte{
 	0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6e, 0x62, 0x6f, 0x78, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x75,
 	0x74, 0x62, 0x6f, 0x78, 0x18, 0x21, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6f, 0x75, 0x74, 0x62,
 	0x6f, 0x78, 0x12, 0x1c, 0x0a, 0x09, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x69, 0x6e, 0x67, 0x18,
-	0x22, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x69, 0x6e, 0x67,
+	0x22, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x69, 0x6e, 0x67,
 	0x12, 0x1c, 0x0a, 0x09, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x73, 0x18, 0x23, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x09, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x73, 0x12, 0x14,
-	0x0a, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x64, 0x18, 0x24, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c,
+	0x03, 0x28, 0x09, 0x52, 0x09, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x73, 0x12, 0x14,
+	0x0a, 0x05, 0x6c, 0x69, 0x6b, 0x65, 0x64, 0x18, 0x24, 0x20, 0x03, 0x28, 0x09, 0x52, 0x05, 0x6c,
 	0x69, 0x6b, 0x65, 0x64, 0x12, 0x2c, 0x0a, 0x11, 0x70, 0x72, 0x65, 0x66, 0x65, 0x72, 0x72, 0x65,
 	0x64, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x25, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x11, 0x70, 0x72, 0x65, 0x66, 0x65, 0x72, 0x72, 0x65, 0x64, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61,

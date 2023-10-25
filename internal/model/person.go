@@ -24,26 +24,14 @@ func (p *Person) SavePerson() error {
 	Location VARCHAR(255),
 	Preview VARCHAR(255),
 	PublishedTime INTEGER,
-	Replies VARCHAR(255),
 	StartTime INTEGER,
 	Summary VARCHAR(255),
-	Tag VARCHAR(255),
 	UpdatedTime INTEGER,
-	Url VARCHAR(255),
-	Too VARCHAR(255),
-	Bto VARCHAR(255),
-	Cc VARCHAR(255),
-	Bcc VARCHAR(255),
 	Likes VARCHAR(255),
 	Shares VARCHAR(255),
 	Inbox VARCHAR(255),
 	Outbox VARCHAR(255),
-	Following VARCHAR(255),
-	Followers VARCHAR(255),
-	Liked VARCHAR(255),
 	PreferredUsername VARCHAR(255),
-	Endpoints VARCHAR(255),
-	Streams VARCHAR(255),
 	PublicKey VARCHAR(255),
 	FragmentationKey VARCHAR(255)
 )`
@@ -51,11 +39,11 @@ func (p *Person) SavePerson() error {
 	if err != nil {
 		return err
 	}
-	statement, err := db.Prepare("INSERT INTO PERSON (Id,Attachment,AttributedTo,Context,MediaType,EndTime,Generator,Icon,Image,InReplyTo,Location,Preview,PublishedTime,Replies,StartTime,Summary,Tag,UpdatedTime,Url,Too,Bto,Cc,Bcc,Likes,Shares,Inbox,Outbox,Following,Followers,Liked,PreferredUsername,Endpoints,Streams,PublicKey,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	statement, err := db.Prepare("INSERT INTO PERSON (Id,Attachment,AttributedTo,Context,MediaType,EndTime,Generator,Icon,Image,InReplyTo,Location,Preview,PublishedTime,StartTime,Summary,UpdatedTime,Likes,Shares,Inbox,Outbox,PreferredUsername,PublicKey,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		return err
 	}
-	_, err = statement.Exec(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.Replies, p.StartTime, p.Summary, p.Tag, p.UpdatedTime, p.Url, p.Too, p.Bto, p.Cc, p.Bcc, p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams, p.PublicKey, p.FragmentationKey)
+	_, err = statement.Exec(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.StartTime, p.Summary, p.UpdatedTime, p.Likes, p.Shares, p.Inbox, p.Outbox, p.PreferredUsername, p.PublicKey, p.FragmentationKey)
 	if err != nil {
 		return err
 	}
@@ -76,7 +64,7 @@ func (p *Person) GetPerson(pid string) error {
 		panic(err)
 	}
 	row.Next()
-	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.Tag, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
+	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
 	if err != nil {
 		panic(err)
 	}
@@ -104,7 +92,7 @@ func (p *Person) GetPerson(pid string) error {
 // 	}
 // 	defer rows.Close()
 // 	for rows.Next() {
-// 		err = rows.Scan(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.Replies, p.StartTime, p.Summary, p.Tag, p.UpdatedTime, p.Url, p.Too, p.Bto, p.Cc, p.Bcc, p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams, p.PublicKey, p.FragmentationKey)
+// 		err = rows.Scan(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.Replies, p.StartTime, p.Summary,  p.UpdatedTime, p.Url, p.Too, p.Bto, p.Cc, p.Bcc, p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams, p.PublicKey, p.FragmentationKey)
 // 		if err != nil {
 // 			panic(err)
 // 		}
@@ -130,7 +118,7 @@ func (p *Person) GetPerson(pid string) error {
 // 		panic(err)
 // 	}
 // 	row.Next()
-// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.Tag, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
+// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary,  &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
 // 	if err != nil {
 // 		panic(err)
 // 	}
@@ -159,8 +147,8 @@ func (p *Person) GetPerson(pid string) error {
 // 		panic(err)
 // 	}
 // 	p := Person{}
+// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
 // 	row.Next()
-// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.Tag, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
 // 	if err != nil {
 // 		panic(err)
 // 	}
