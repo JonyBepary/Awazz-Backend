@@ -16,10 +16,11 @@ func (n *Notifications) SaveNotifications() error {
 	}
 	defer db.Close()
 	str := `
-	CREATE TABLE IF NOT EXISTS Messages (
+	CREATE TABLE IF NOT EXISTS NOTIFICATIONS (
+	Receiver VARCHAR(128) PRIMARY KEY NOT NULL,
 	Title VARCHAR(128),
     Body VARCHAR(128),
-    Source VARCHAR(128) PRIMARY KEY,
+    Source VARCHAR(128),
     Image VARCHAR(128),
     Sound VARCHAR(128),
     Time INTEGER,
@@ -33,13 +34,13 @@ func (n *Notifications) SaveNotifications() error {
 		return err
 	}
 	str2 := `
-INSERT INTO Messages (Title,Body,Source,Image,Sound,Time,Channel,PriorityLevel,ReadStatus,Created) VALUES (?,?,?,?,?,?,?,?,?,?);
+INSERT INTO NOTIFICATIONS (Receiver,Title,Body,Source,Image,Sound,Time,Channel,PriorityLevel,ReadStatus,Created) VALUES (?,?,?,?,?,?,?,?,?,?,?);
 	`
 	statement, err := db.Prepare(str2)
 	if err != nil {
 		return err
 	}
-	_, err = statement.Exec(n.Title, n.Body, n.Source, n.Image, n.Sound, n.Time, n.Channel, n.PriorityLevel, n.ReadStatus, n.Created)
+	_, err = statement.Exec(n.Receiver, n.Title, n.Body, n.Source, n.Image, n.Sound, n.Time, n.Channel, n.PriorityLevel, n.ReadStatus, n.Created)
 	if err != nil {
 		return err
 	}
@@ -48,7 +49,7 @@ INSERT INTO Messages (Title,Body,Source,Image,Sound,Time,Channel,PriorityLevel,R
 }
 
 func (n *Notifications) GetNotifications(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +79,7 @@ func (n *Notifications) GetNotifications(msgId string) error {
 }
 
 func (u *Notifications) UpdateNotifications(Title, Body, Source string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -95,8 +96,9 @@ func (u *Notifications) UpdateNotifications(Title, Body, Source string) error {
 
 	return nil
 }
+
 func (d *Notifications) DeleteNotifications(Source string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}

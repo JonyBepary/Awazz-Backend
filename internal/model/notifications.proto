@@ -5,16 +5,16 @@ option go_package = ".;model";
 // import "google/protobuf/timestamp.proto";
 
 message Notifications{
-    string title= 1;
-    string body= 2;
-    string source = 3;
-    string image = 4;
-    string sound= 5 ;
-    int64 time = 6 ;
-    string channel = 7;
-    int64 priority_level = 8;
-    bool readStatus = 9;
-    int64 created = 10;
-
-}
+        string receiver = 1;
+        string title = 2;
+        string body = 3;
+        string source = 4;
+        string image = 5;
+        string sound = 6;
+        int64 time = 7;
+        string channel = 8;
+        int64 priority_level = 9;
+        bool read_status = 10;
+        int64 created = 11;
+    }
 
