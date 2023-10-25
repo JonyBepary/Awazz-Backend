@@ -16,14 +16,14 @@ message Follower{
     bool Status = 2;
     int64 Time = 3 ;
     string FollowAccount = 4;
-    string unfollowAccount =5;
-    
+    string UnfollowAccount =5;
+
 }
 
 message Followee{
     string UserId = 1;
 
-    string BlockAccountLink = 2; 
+    string BlockAccountLink = 2;
     string BlockAccountName =3;
     int64 Time = 4;
 }

@@ -12,7 +12,7 @@ import (
 */
 
 func (s *Follower) SaveFollower() error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +46,7 @@ func (s *Follower) SaveFollower() error {
 }
 
 func (g *Follower) GetFollower(UserID string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func (g *Follower) GetFollower(UserID string) error {
 }
 
 // func (u *Follower) UpdatedFollower(UserId string) error {
-// 	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+// 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 // 	if err != nil {
 // 		panic(err)
 // 	}
@@ -93,7 +93,7 @@ func (g *Follower) GetFollower(UserID string) error {
 // }
 
 func (d *Follower) DeleteFollowee(FolloweeId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -102,7 +102,7 @@ func (d *Follower) DeleteFollowee(FolloweeId string) error {
 	// another rule don't type something that can be copied
 	// typing on your own tends to bring more mistake
 	// baki table check koro okay): abar thik ache bhai
-	_, err = db.Exec("DELETE FROM  Follower WHERE  UserId= ?", FolloweeId)  /// mair khabatable name thik koroe 
+	_, err = db.Exec("DELETE FROM  Follower WHERE  UserId= ?", FolloweeId)  /// mair khabatable name thik koroe
 
 	if err != nil {
 		log.Fatal(err)
@@ -115,7 +115,7 @@ func (d *Follower) DeleteFollowee(FolloweeId string) error {
 */
 
 func (s *Followee) SaveFollowee() error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -146,7 +146,7 @@ func (s *Followee) SaveFollowee() error {
 }
 
 func (g *Followee) GetFollowee(UserId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -177,7 +177,7 @@ func (g *Followee) GetFollowee(UserId string) error {
 }
 
 // func (u *Followee) UpdatedFollowee(UserId string) error {
-// 	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+// 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 // 	if err != nil {
 // 		panic(err)
 // 	}
@@ -192,7 +192,7 @@ func (g *Followee) GetFollowee(UserId string) error {
 // }
 
 func (d *Followee) DeleteFollower(FollowerId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
