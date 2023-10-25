@@ -14,7 +14,7 @@ func (p *Post) SavePost() error {
 	}
 	defer db.Close()
 	str := `
-	CREATE TABLE if not EXISTS POST(
+	CREATE TABLE IF NOT EXISTS POST(
     Id VARCHAR(255) PRIMARY KEY,
     Community VARCHAR(255),
     Content TEXT,
@@ -27,9 +27,6 @@ func (p *Post) SavePost() error {
     Author VARCHAR(255),
     Parent VARCHAR(255),
     Rank INTEGER,
-    Children VARCHAR(255),
-    Tags VARCHAR(255),
-    Mentions VARCHAR(255),
     IsSensitive BOOLEAN,
     IsNsfw BOOLEAN,
     IsDeleted BOOLEAN,
@@ -74,9 +71,6 @@ func (p *Post) SavePost() error {
 		p.Author,
 		p.Parent,
 		p.Rank,
-		p.Children,
-		p.Tags,
-		p.Mentions,
 		p.IsSensitive,
 		p.IsNsfw,
 		p.IsDeleted,
@@ -118,7 +112,7 @@ func (p *Post) GetPost(msgId string) error {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(p.Id, p.Community, p.Content, p.CreatedAt, p.UpdatedAt, p.DeletedAt, p.Likes, p.Shares, p.Comments, p.Author, p.Parent, p.Rank, p.Children, p.Tags, p.Mentions, p.IsSensitive, p.IsNsfw, p.IsDeleted, p.IsPinned, p.IsEdited, p.IsLiked, p.IsShared, p.IsCommented, p.IsSubscribed, p.IsBookmarked, p.IsReblogged, p.IsMentioned, p.IsPoll, p.IsPollVoted, p.IsPollExpired, p.IsPollClosed, p.IsPollMultiple, p.IsPollHideTotals, p.FragmentationKey)
+		err = rows.Scan(p.Id, p.Community, p.Content, p.CreatedAt, p.UpdatedAt, p.DeletedAt, p.Likes, p.Shares, p.Comments, p.Author, p.Parent, p.Rank, p.IsSensitive, p.IsNsfw, p.IsDeleted, p.IsPinned, p.IsEdited, p.IsLiked, p.IsShared, p.IsCommented, p.IsSubscribed, p.IsBookmarked, p.IsReblogged, p.IsMentioned, p.IsPoll, p.IsPollVoted, p.IsPollExpired, p.IsPollClosed, p.IsPollMultiple, p.IsPollHideTotals, p.FragmentationKey)
 		if err != nil {
 			panic(err)
 		}
@@ -131,7 +125,7 @@ func (p *Post) GetPost(msgId string) error {
 	return nil
 }
 func (u *Post) UpdatePost(ID string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -147,7 +141,7 @@ func (u *Post) UpdatePost(ID string) error {
 	return nil
 }
 func (d *Post) DeletePost(Id string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}

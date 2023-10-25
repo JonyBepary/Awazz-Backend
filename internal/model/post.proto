@@ -44,13 +44,13 @@ message Post {
   int64 rank = 12;
 
   // Child posts of the current post.
-  string children = 13;
+  repeated string children = 13;
 
   // Tags associated with the post.
-  string tags = 14;
+  repeated string tags = 14;
 
   // Users mentioned in the post.
-  string mentions = 15;
+  repeated string mentions = 15;
 
   // Indicates if the post is sensitive.
   bool is_sensitive = 16;
@@ -105,5 +105,7 @@ message Post {
 
   // Indicates if the poll hides the total number of votes.
   bool is_poll_hide_totals = 33;
+  
+  // Fragmented key if available.
   string FragmentationKey = 34;
 }
