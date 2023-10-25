@@ -68,7 +68,6 @@ func (p *Community) GetCommunity(cid string) error {
 	return nil
 }
 
-
 func (p *Instance) Create() error {
 
 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
@@ -77,35 +76,59 @@ func (p *Instance) Create() error {
 	}
 	defer db.Close()
 	str := `
-	CREATE TABLE INSTANCE (
+	CREATE TABLE IF NOT EXISTS INSTANCE (
     Id VARCHAR(255) PRIMARY KEY,
     Name VARCHAR(255),
     Description TEXT,
     Type VARCHAR(255),
     Status VARCHAR(255),
-    Owner VARCHAR(255),
-    CreatedBy VARCHAR(255),
-    CommunityIds TEXT[],
     CreatedAt TIMESTAMP,
     UpdatedBy VARCHAR(255),
     UpdatedAt TIMESTAMP,
     DeletedBy VARCHAR(255),
-    DeletedAt TIMESTAMP,
-    Tags TEXT[],
-    Labels TEXT[],
-    PublicDomain TEXT[]
+    DeletedAt TIMESTAMP
 )`
 	_, err = db.Exec(str)
 	if err != nil {
 		panic(err)
 	}
-	statement, err := db.Prepare("INSERT INTO INSTANCE (Id,Name,Description,Type,Status,Owner,CreatedBy,CommunityIds,CreatedAt,UpdatedBy,UpdatedAt,DeletedBy,DeletedAt,Tags,Labels,PublicDomain) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	statement, err := db.Prepare("INSERT INTO INSTANCE (Id,Name,Description,Type,Status,CreatedAt,UpdatedBy,UpdatedAt,DeletedBy,DeletedAt) VALUES (?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		panic(err)
 	}
-	_, err = statement.Exec(p.Id, p.Name, p.Description, p.Type, p.Status, p.Owner, p.CreatedBy, p.CommunityIds, p.CreatedAt, p.UpdatedBy, p.UpdatedAt, p.DeletedBy, p.DeletedAt, p.Tags, p.Labels, p.PublicDomain)
+	_, err = statement.Exec(p.Id, p.Name, p.Description, p.Type, p.Status, p.CreatedAt, p.UpdatedBy, p.UpdatedAt, p.DeletedBy, p.DeletedAt)
 	if err != nil {
 		panic(err)
 	}
+	return nil
+}
+
+func (p *Instance) GetInstance(cid string) error {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	// spew.Dump(rows)
+	//! fmt.Println("message id is: ", pid)
+	row, err := db.Query("SELECT * FROM INSTANCE WHERE Id=?", cid)
+	if err != nil {
+		panic(err)
+	}
+
+	row.Next()
+	err = row.Scan(p.Id, p.Name, p.Description, p.Type, p.Status, p.Owner, p.CreatedBy, p.CommunityIds, p.CreatedAt, p.UpdatedBy, p.UpdatedAt, p.DeletedBy, p.DeletedAt, p.Tags, p.Labels, p.PublicDomain)
+	if err != nil {
+		panic(err)
+	}
+
+	err = row.Err()
+	if err != nil {
+		panic(err)
+	}
+	row.Close()
+
+	//! spew.Dump(p.Id)
 	return nil
 }

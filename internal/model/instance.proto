@@ -18,11 +18,11 @@ message Instance {
     // Status of the instance.
     string status = 5;
     // Owner of the instance.
-    string owner = 6;
+    repeated string owner = 6;
     // Creator of the instance.
-    string created_by = 7;
+    repeated string created_by = 7;
     // List of community IDs associated with the instance.
-    string community_ids = 8;
+    repeated string community_ids = 8;
     // Timestamp when the instance was created.
     int64 created_at = 9;
     // Updater of the instance.
@@ -34,11 +34,11 @@ message Instance {
     // Timestamp when the instance was deleted.
     int64 deleted_at = 13;
     // List of tags associated with the instance.
-    string tags = 14;
+    repeated string tags = 14;
     // List of labels associated with the instance.
-    string labels = 15;
+    repeated string labels = 15;
     // list of public domain of the instance.
-    string public_domain = 16;
+    repeated string public_domain = 16;
 }
 
 
