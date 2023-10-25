@@ -9,13 +9,13 @@ import (
 )
 
 func (msg *Messages) SaveMessages() error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 	str := `
-	CREATE TABLE IF NOT EXISTS Messages (
+	CREATE TABLE IF NOT EXISTS MESSAGE (
 		MsgId VARCHAR(128) PRIMARY KEY,
 		SenderId  VARCHAR(128),
 		ReceiverId  VARCHAR(128),
@@ -27,13 +27,13 @@ func (msg *Messages) SaveMessages() error {
 		Attachment TEXT,
 		Types TEXT,
 		Reaction TEXT)
-		`
+	`
 	_, err = db.Exec(str)
 	if err != nil {
 		panic(err)
 	}
 
-	statement, err := db.Prepare("INSERT INTO Messages (MsgId,SenderId,ReceiverId,Content,SentTime,LastEdit,DeleteTime,Status,Attachment,Types,Reaction) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
+	statement, err := db.Prepare("INSERT INTO MESSAGE (MsgId,SenderId,ReceiverId,Content,SentTime,LastEdit,DeleteTime,Status,Attachment,Types,Reaction) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
 
 	if err != nil {
 		panic(err)
@@ -47,13 +47,13 @@ func (msg *Messages) SaveMessages() error {
 }
 
 func (m *Messages) GetMessages(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	rows, err := db.Query(fmt.Sprintf("select * from Messages where msgId = %v", msgId))
+	rows, err := db.Query(fmt.Sprintf("select * from MESSAGE where msgId = %v", msgId))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func (m *Messages) GetMessages(msgId string) error {
 }
 
 func (u *Messages) UpdatedMessages(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -93,13 +93,13 @@ func (u *Messages) UpdatedMessages(msgId string) error {
 }
 
 func (d *Messages) DeleteMessages(msgId string) error {
-	db, err := durable.CreateDatabase("./Database/", "common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
-	_, err = db.Exec("DELETE FROM  Messages WHERE  msgId= ?", msgId)
+	_, err = db.Exec("DELETE FROM  MESSAGE WHERE  msgId= ?", msgId)
 
 	d.LastEdit = time.Now().Unix()
 
