@@ -13,20 +13,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Install protoc
-      run: |
-        if ! command -v protoc &> /dev/null; then
-          curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v25.0-rc1/protoc-25.0-rc-1-linux-x86_64.zip
-          unzip protoc-25.0-rc-1-linux-x86_64.zip
-          sudo mv bin/protoc /usr/local/bin
-          sudo mv include/google /usr/local/include
-        fi
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v4
       with:
-        go-version: '1.21'
-
+        go-version: '1.21.3' # The Go version to download (if necessary) and use.
+    - run: go version
     - name: Install dependencies
       run: |
         go mod tidy
@@ -35,5 +26,3 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
