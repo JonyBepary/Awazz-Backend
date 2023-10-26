@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+message User{
+    string userName = 2;
+    string password = 3;
+    string email = 4;
+    string profilePicUrl = 5;
+    int64 accountTime = 6;
+    string birthDate = 7;
+    string gender = 8;
+    int64 lastEdit = 9;
+}
