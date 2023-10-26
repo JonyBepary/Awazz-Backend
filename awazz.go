@@ -26,6 +26,8 @@ func main() {
 	r.GET("/followee", getFollowee)
 	r.POST("/notification", saveNotification)
 	r.GET("/notification", getNotification)
+	r.POST("/likes", saveLikes)
+	r.GET("/likes", getLikes)
 
 	// r.GET("/login", getMessage)
 	// r.POST("/register", saveMessage)

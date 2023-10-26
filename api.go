@@ -12,6 +12,26 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// func check_login(c *gin.Context) {
+// 	var p model.Login{}
+// 	err := c.Bind(&p)
+// 	if err != nil {
+// 		println(err.Error())
+// 		c.JSON(500, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	// Save instance in sqlite database
+// 	err = p.CheckLogin()
+// 	if err != nil {
+// 		c.JSON(500, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(200, p)
+
+// }
+
 // getPost function gets the post object from the LevelDB database and returns the post object.
 func getPost(c *gin.Context) {
 	var post model.Post
@@ -560,6 +580,58 @@ func getFollowee(c *gin.Context) {
 		return
 	}
 
+	ldb.Close()
+	c.JSON(200, p)
+}
+
+func saveLikes(c *gin.Context) {
+	p := model.Likes{}
+	err := c.Bind(&p)
+	if err != nil {
+		println(err.Error())
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	// PRINT instance OBJECT TO CONSOLE INTENDED FOR DEBUGGING
+	// spew.Config.Indent = "\t"
+	// spew.Dump(p)
+
+	// Save instance in sqlite database
+	err = p.SaveLikes()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	// CREATING LEVELDB DATABASE
+	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		panic(err)
+	}
+
+	blob, err := proto.Marshal(&p)
+	if err != nil {
+		log.Print(err)
+	}
+	ldb.Put([]byte(fmt.Sprintf("like_%v", p.UserId)), blob, nil)
+	ldb.Close()
+	c.JSON(200, p)
+
+}
+
+func getLikes(c *gin.Context) {
+	p := model.Likes{}
+	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	blob, err := ldb.Get([]byte(fmt.Sprintf("like_%v", p.UserId)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	proto.Unmarshal(blob, &p)
 	ldb.Close()
 	c.JSON(200, p)
 }
