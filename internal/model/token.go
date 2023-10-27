@@ -30,7 +30,7 @@ func (s *Token) SaveToken() error {
 		panic(err)
 	}
 
-	_, err = statement.Exec(s.UserName,s.Token,s.GenerateTime)
+	_, err = statement.Exec(s.UserName, s.Token, s.GenerateTime)
 	if err != nil {
 		panic(err)
 	}
@@ -69,8 +69,6 @@ func (g *Token) GetTokenFromDB(UserName string) error {
 	return nil
 }
 
-
-
 func (u *Token) UpdatedToken(UserName string) error {
 	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
@@ -87,7 +85,6 @@ func (u *Token) UpdatedToken(UserName string) error {
 	return nil
 }
 
-
 func (d *Token) DeleteToken(UserName string) error {
 	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {
@@ -97,7 +94,6 @@ func (d *Token) DeleteToken(UserName string) error {
 
 	_, err = db.Exec("DELETE FROM  TOKEN WHERE  UserName= ?", UserName)
 
-	
 	if err != nil {
 		log.Fatal(err)
 	}
