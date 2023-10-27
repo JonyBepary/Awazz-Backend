@@ -1,0 +1,10 @@
+syntax  = "proto3";
+
+package model;
+option go_package  = ".;model";
+
+message Token{
+    string userName = 1;
+    string token = 2;
+    int64 generateTime = 3 ;
+}
