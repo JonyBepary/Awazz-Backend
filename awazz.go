@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	r := gin.Default()
 	r.GET("/post", getPost)
 	r.POST("/post", savePost)
@@ -28,10 +29,11 @@ func main() {
 	r.GET("/notification", getNotification)
 	r.POST("/likes", saveLikes)
 	r.GET("/likes", getLikes)
+	r.GET("/login", login)
+	r.POST("/register", register)
 
 	// r.GET("/login", getMessage)
 	// r.POST("/register", saveMessage)
-
 
 	r.Run(":9091")
 }

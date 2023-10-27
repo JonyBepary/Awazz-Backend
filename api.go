@@ -2,38 +2,219 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
+	"github.com/SohelAhmedJoni/Awazz-Backend/internal/middlewares"
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/model"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/proto"
 )
 
-// func check_login(c *gin.Context) {
-// 	var p model.Login{}
-// 	err := c.Bind(&p)
-// 	if err != nil {
-// 		println(err.Error())
-// 		c.JSON(500, gin.H{"error": err.Error()})
-// 		return
-// 	}
+// set expire time to 1 day
+var expireTime int64 = 3600 * 24
 
-// 	// Save instance in sqlite database
-// 	err = p.CheckLogin()
-// 	if err != nil {
-// 		c.JSON(500, gin.H{"error": err.Error()})
-// 		return
-// 	}
+// check_login checks if the user is logged in.
+func check_login(c *gin.Context) error {
 
-// 	c.JSON(200, p)
+	UserId := c.GetHeader("Anon-User")
+	token := c.GetHeader("Anon-Token")
 
-// }
+	if token == "" {
+		// Token is missing, return 401
+		return errors.New("missing Anon-Token")
+	}
+	if UserId == "" {
+		// UserId is missing, return 401
+		return errors.New("missing Anon-User")
+	}
+	ldb, err := durable.LeveldbCreateDatabase("Database/", "Token", "/")
+	if err != nil {
+		return err
+	}
+	defer ldb.Close()
+	blob, err := ldb.Get([]byte(fmt.Sprintf("token_%v", UserId)), nil)
+	if err != nil {
+		return err
+	}
+	t := model.Token{}
+	err = proto.Unmarshal(blob, &t)
+	if err != nil {
+		return err
+	}
+
+	if token != t.Token {
+		return errors.New("token mismatch")
+	}
+	remainingTime := t.GetGenerateTime() + expireTime - time.Now().Unix()
+	if remainingTime < 0 {
+		// remove token from database
+		err = ldb.Delete([]byte(fmt.Sprintf("token_%v", UserId)), nil)
+		if err != nil {
+			return errors.New("token expired and token removal failed")
+		}
+
+		return errors.New("token expired and removed from database")
+	}
+	return nil
+}
+
+// login handles user login requests.
+// It takes a gin.Context object as input and retrieves the username and password from the query parameters.
+// If either the username or password is missing, it returns a 401 error.
+// It then checks if the user exists in the database and retrieves the user object.
+// If the password is incorrect, it returns a 401 error.
+// If the user exists and the password is correct, it generates a token for the user and saves it in the database.
+// It returns the generated token in the response body.
+func login(c *gin.Context) {
+
+	// function implementation
+	username := c.Query("username")
+	password := c.Query("password")
+	if username == "" {
+		// UserId is missing, return 401
+		c.JSON(401, gin.H{"error": "missing user name"})
+		return
+	}
+	if password == "" {
+		// UserId is missing, return 401
+		c.JSON(401, gin.H{"error": "missing password"})
+		return
+	}
+	// check if user exists
+	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	blob, err := ldb.Get([]byte(fmt.Sprintf("user_%v", username)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	user := model.User{}
+	err = proto.Unmarshal(blob, &user)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	if user.Password != password {
+		c.JSON(401, gin.H{"error": "wrong password"})
+		return
+	}
+	ldb.Close()
+
+	ldb, err = durable.LeveldbCreateDatabase("Database/", "Token", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	token := model.Token{}
+	token.UserName = username
+	token.GenerateTime = time.Now().Unix()
+	token.Token = middlewares.TokenGenerator(token.UserName, string(token.GenerateTime), "Awazz")
+	err = token.SaveToken()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	blob, err = proto.Marshal(&token)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = ldb.Put([]byte("token_"+username), blob, nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ldb.Close()
+
+	c.JSON(200, token)
+}
+
+// register is a handler function for the registration endpoint.
+// It checks if the user is logged in, binds the user object to the gin context,
+// checks if the user exists, saves the user data, and puts the user object in leveldb.
+// It returns an error if any of the above steps fail.
+func register(c *gin.Context) {
+
+	// function implementation
+	u := model.User{}
+	//binding the user object to the gin context
+	err := c.Bind(&u)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	// PRINT user OBJECT TO CONSOLE INTENDED FOR DEBUGGING
+	spew.Config.Indent = "\t"
+	spew.Dump(u)
+
+	if u.UserName == "" {
+		// UserId is missing, return 401
+		c.JSON(401, gin.H{"error": "missing user name"})
+		return
+	}
+	if u.Password == "" {
+		// UserId is missing, return 401
+		c.JSON(401, gin.H{"error": "missing password"})
+		return
+	}
+
+	// check if user exists
+	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	_, err = ldb.Get([]byte(fmt.Sprintf("user_%v", u.UserName)), nil)
+	if err == nil {
+		c.JSON(401, gin.H{"error": "username already exists"})
+		return
+	}
+	u.AccountTime = time.Now().Unix()
+
+	err = u.SaveUserData()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	// putting user object in leveldb
+	blob, err := proto.Marshal(&u)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	err = ldb.Put([]byte(fmt.Sprintf("user_%v", u.UserName)), blob, nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ldb.Close()
+
+	c.JSON(200, u)
+
+}
 
 // getPost function gets the post object from the LevelDB database and returns the post object.
 func getPost(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var post model.Post
 	post.Id = c.Param("id")
 	// err := post.GetPost(post.Id)
@@ -46,6 +227,7 @@ func getPost(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("post_%v", post.Id)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -61,6 +243,13 @@ func getPost(c *gin.Context) {
 
 // savePost function saves the post object to the LevelDB database and returns the saved post object.
 func savePost(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var post model.Post
 	err := c.BindJSON(&post)
 	if err != nil {
@@ -87,6 +276,13 @@ func savePost(c *gin.Context) {
 
 // getPerson function gets the person object from the LevelDB database and returns the person object.
 func getPerson(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Person
 	pid := c.Query("Id")
 	println("pid: " + pid)
@@ -101,6 +297,7 @@ func getPerson(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("person_%v", pid)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -116,6 +313,13 @@ func getPerson(c *gin.Context) {
 
 // savePerson function saves the person object to the LevelDB database and returns the saved person object.
 func savePerson(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	person := model.Person{}
 	err := c.Bind(&person)
 	if err != nil {
@@ -162,6 +366,13 @@ func savePerson(c *gin.Context) {
 // It takes a gin.Context object as input and binds the community object to it. It then creates a LevelDB database and saves the community object to it.
 // It also saves the admin, mod, and member IDs of the community to the database. Finally, it returns the saved community object.
 func saveCommunity(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	community := model.Community{}
 	err := c.Bind(&community)
 	if err != nil {
@@ -213,13 +424,24 @@ func saveCommunity(c *gin.Context) {
 	c.JSON(200, fmt.Sprintf("%+v", community))
 }
 
-// func saveCommunity(c *gin.Context) {
 func getCommunity(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Community
 	cid := c.Query("id")
 	//! println("pid: " + pid)
 	// err := p.GetCommunity(cid)
 	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("community_%v", cid)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -239,6 +461,12 @@ func getCommunity(c *gin.Context) {
 // It takes a gin.Context object as input and binds the community object to it. It then creates a LevelDB database and saves the community object to it.
 // It also saves the admin, mod, and member IDs of the community to the database. Finally, it returns the saved community object.
 func saveInstance(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
 
 	p := model.Instance{}
 	err := c.Bind(&p)
@@ -271,7 +499,7 @@ func saveInstance(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
+	defer ldb.Close()
 	blob, err := proto.Marshal(&p)
 	if err != nil {
 		log.Print(err)
@@ -283,6 +511,13 @@ func saveInstance(c *gin.Context) {
 
 // func saveCommunity(c *gin.Context) {
 func getInstance(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Instance
 	Iid := c.Query("Id")
 	//! println("pid: " + pid)
@@ -292,7 +527,7 @@ func getInstance(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("instance_%v", Iid)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -310,6 +545,13 @@ func getInstance(c *gin.Context) {
 }
 
 func saveComment(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	p := model.Comment{}
 	err := c.Bind(&p)
 	if err != nil {
@@ -336,6 +578,13 @@ func saveComment(c *gin.Context) {
 }
 
 func getComment(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Comment
 	p.Id = c.Query("cid")
 	p.PostId = c.Query("pid")
@@ -351,6 +600,12 @@ func getComment(c *gin.Context) {
 }
 
 func saveMessage(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
 
 	p := model.Messages{}
 	err := c.Bind(&p)
@@ -375,7 +630,7 @@ func saveMessage(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
+	defer ldb.Close()
 	blob, err := proto.Marshal(&p)
 	if err != nil {
 		log.Print(err)
@@ -386,6 +641,13 @@ func saveMessage(c *gin.Context) {
 }
 
 func getMessage(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Messages
 	msg_id := c.Query("MsgId")
 	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
@@ -393,6 +655,7 @@ func getMessage(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("message_%v", msg_id)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -410,6 +673,12 @@ func getMessage(c *gin.Context) {
 }
 
 func saveNotification(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
 
 	p := model.Notifications{}
 	err := c.Bind(&p)
@@ -434,7 +703,7 @@ func saveNotification(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
+	defer ldb.Close()
 	blob, err := proto.Marshal(&p)
 	if err != nil {
 		log.Print(err)
@@ -445,6 +714,13 @@ func saveNotification(c *gin.Context) {
 }
 
 func getNotification(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Notifications
 	notification_id := c.Query("NotificationId")
 	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
@@ -452,6 +728,7 @@ func getNotification(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("notification_%v", notification_id)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -469,6 +746,12 @@ func getNotification(c *gin.Context) {
 }
 
 func saveFollower(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
 
 	p := model.Follower{}
 	err := c.Bind(&p)
@@ -493,7 +776,7 @@ func saveFollower(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
+	defer ldb.Close()
 	blob, err := proto.Marshal(&p)
 	if err != nil {
 		log.Print(err)
@@ -504,6 +787,13 @@ func saveFollower(c *gin.Context) {
 }
 
 func getFollower(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	var p model.Follower
 	user_id := c.Query("UserId")
 	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
@@ -511,6 +801,7 @@ func getFollower(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("follower_%v", user_id)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -527,6 +818,13 @@ func getFollower(c *gin.Context) {
 	c.JSON(200, p)
 }
 func saveFollowee(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	p := model.Followee{}
 	err := c.Bind(&p)
 	if err != nil {
@@ -550,7 +848,7 @@ func saveFollowee(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
+	defer ldb.Close()
 	blob, err := proto.Marshal(&p)
 	if err != nil {
 		log.Print(err)
@@ -561,6 +859,13 @@ func saveFollowee(c *gin.Context) {
 }
 
 func getFollowee(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	p := model.Followee{}
 	user_id := c.Query("UserId")
 	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
@@ -568,6 +873,7 @@ func getFollowee(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("followee_%v", user_id)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -585,6 +891,13 @@ func getFollowee(c *gin.Context) {
 }
 
 func saveLikes(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	p := model.Likes{}
 	err := c.Bind(&p)
 	if err != nil {
@@ -608,7 +921,7 @@ func saveLikes(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
+	defer ldb.Close()
 	blob, err := proto.Marshal(&p)
 	if err != nil {
 		log.Print(err)
@@ -620,12 +933,20 @@ func saveLikes(c *gin.Context) {
 }
 
 func getLikes(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
 	p := model.Likes{}
 	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	defer ldb.Close()
 	blob, err := ldb.Get([]byte(fmt.Sprintf("like_%v", p.UserId)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
