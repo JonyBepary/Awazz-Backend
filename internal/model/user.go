@@ -17,11 +17,11 @@ func (s *User) SaveUserData() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS USER (
-			UserName VARCHAR(128) PRIMARY KEY , 
+			UserName VARCHAR(128) PRIMARY KEY ,
 			Password VARCHAR(128) NOT NULL,
 			Email VARCHAR(128) ,
 			ProfilePicUrl TEXT ,
-			AccountTime INTEGER, 
+			AccountTime INTEGER,
 			BirthDate TEXT ,
 			Gender TEXT ,
 			LastEdit INTEGER)
