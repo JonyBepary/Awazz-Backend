@@ -7,10 +7,11 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/glebarez/go-sqlite v1.21.2
-	github.com/mr-tron/base58 v1.2.0
+	github.com/oklog/ulid/v2 v2.1.0
 	github.com/stretchr/testify v1.8.4
 	github.com/syndtr/goleveldb v1.0.0
 	golang.org/x/crypto v0.9.0
+	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	google.golang.org/protobuf v1.31.0
 )
 

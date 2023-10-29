@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+
+message File{
+    string uuid = 1;
+    string name = 2;
+    int64 created_at = 3;
+    int64 updated_at = 4;
+    string hash = 5;
+    string hash_type = 6;
+    string mime_type = 7;
+    string ext = 8;
+
+    message FileData{
+        bytes data = 1;
+    }
+}
+
+
+
+message FileList{
+    repeated File files = 1;
+}

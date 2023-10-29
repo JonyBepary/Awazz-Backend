@@ -1,13 +1,10 @@
 package main
 
+import "github.com/gin-gonic/gin"
+
 // "github.com/SohelAhmedJoni/Awazz-Backend/internal/model"
 
-import (
-	"github.com/gin-gonic/gin"
-)
-
 func main() {
-
 	r := gin.Default()
 	r.GET("/post", getPost)
 	r.POST("/post", savePost)
@@ -31,9 +28,11 @@ func main() {
 	r.GET("/likes", getLikes)
 	r.GET("/login", login)
 	r.POST("/register", register)
-
-	// r.GET("/login", getMessage)
-	// r.POST("/register", saveMessage)
+	r.POST("/upload", UploadFile)
+	r.GET("/download", DownloadFile)
+	r.POST("/uploads", UploadFiles)
+	r.Static("/Database/assets/", "./Database/assets/")
+	// r.GET("/downloads", DownloadFiles)
 
 	r.Run(":9091")
 }

@@ -24,8 +24,9 @@ func (s *Token) SaveToken() error {
 		panic(err)
 	}
 
-	statement, err := db.Prepare("INSERT INTO TOKEN (UserName, Token, GenerateTime) VALUES (?,?,?)")
+	// check if user already exist
 
+	statement, err := db.Prepare("INSERT OR REPLACE INTO TOKEN (UserName, Token, GenerateTime) VALUES (?,?,?)")
 	if err != nil {
 		panic(err)
 	}

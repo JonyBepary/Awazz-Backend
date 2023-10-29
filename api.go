@@ -5,11 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/middlewares"
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/model"
+	"github.com/SohelAhmedJoni/Awazz-Backend/pkg"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/proto"
@@ -32,7 +36,7 @@ func check_login(c *gin.Context) error {
 		// UserId is missing, return 401
 		return errors.New("missing Anon-User")
 	}
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "Token", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "Token", "/")
 	if err != nil {
 		return err
 	}
@@ -86,7 +90,7 @@ func login(c *gin.Context) {
 		return
 	}
 	// check if user exists
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -109,7 +113,7 @@ func login(c *gin.Context) {
 	}
 	ldb.Close()
 
-	ldb, err = durable.LeveldbCreateDatabase("Database/", "Token", "/")
+	ldb, err = durable.LevelDBCreateDatabase("Database/", "Token", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -171,7 +175,7 @@ func register(c *gin.Context) {
 	}
 
 	// check if user exists
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -222,7 +226,7 @@ func getPost(c *gin.Context) {
 	// 	c.JSON(500, gin.H{"error": err.Error()})
 	// 	return
 	// }
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -261,7 +265,7 @@ func savePost(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	lbd, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	lbd, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -292,7 +296,7 @@ func getPerson(c *gin.Context) {
 	// 	return
 	// }
 	//! spew.Dump(p)
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -348,7 +352,7 @@ func savePerson(c *gin.Context) {
 	person.Liked = c.QueryArray("Liked")
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -385,7 +389,7 @@ func saveCommunity(c *gin.Context) {
 	spew.Dump(community)
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -436,7 +440,7 @@ func getCommunity(c *gin.Context) {
 	cid := c.Query("id")
 	//! println("pid: " + pid)
 	// err := p.GetCommunity(cid)
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -495,7 +499,7 @@ func saveInstance(c *gin.Context) {
 	p.Tags = c.QueryArray("Tags")
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -522,7 +526,7 @@ func getInstance(c *gin.Context) {
 	Iid := c.Query("Id")
 	//! println("pid: " + pid)
 	// err := p.GetCommunity(Iid)
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -626,7 +630,7 @@ func saveMessage(c *gin.Context) {
 	}
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -650,7 +654,7 @@ func getMessage(c *gin.Context) {
 
 	var p model.Messages
 	msg_id := c.Query("MsgId")
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -699,7 +703,7 @@ func saveNotification(c *gin.Context) {
 	}
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -723,7 +727,7 @@ func getNotification(c *gin.Context) {
 
 	var p model.Notifications
 	notification_id := c.Query("NotificationId")
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -772,7 +776,7 @@ func saveFollower(c *gin.Context) {
 	}
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -796,7 +800,7 @@ func getFollower(c *gin.Context) {
 
 	var p model.Follower
 	user_id := c.Query("UserId")
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -844,7 +848,7 @@ func saveFollowee(c *gin.Context) {
 	}
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -868,7 +872,7 @@ func getFollowee(c *gin.Context) {
 
 	p := model.Followee{}
 	user_id := c.Query("UserId")
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -917,7 +921,7 @@ func saveLikes(c *gin.Context) {
 	}
 
 	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		panic(err)
 	}
@@ -941,7 +945,7 @@ func getLikes(c *gin.Context) {
 	}
 
 	p := model.Likes{}
-	ldb, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -956,3 +960,204 @@ func getLikes(c *gin.Context) {
 	ldb.Close()
 	c.JSON(200, p)
 }
+func UploadFile(c *gin.Context) {
+	/*
+	  UploadFile function handles the upload of a single file.
+	  It gets the file from the form data, saves it to the defined path,
+	  generates a unique identifier for the file, saves the file metadata to the database,
+	  and returns a success message and the file metadata.
+	*/
+	// Get the file from the form data
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	uuid := pkg.GetUlid()
+	dir := filepath.Join("Database", "assets")
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file directory"})
+			return
+		}
+	}
+	// Define the path where the file will be saved
+	filePath := filepath.Join(dir, uuid)
+	// Save the file to the defined path
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+
+	// Save file metadata to database
+	fileMetadata := model.File{
+		Uuid:      uuid,
+		Name:      file.Filename,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: 0,
+		Hash:      pkg.FileHashGeneration(filePath),
+		MimeType:  file.Header.Get("Content-Type"),
+		Ext:       filepath.Ext(file.Filename),
+	}
+	err = fileMetadata.Save()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file metadata"})
+		return
+	}
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file directory"})
+		return
+	}
+	defer ldb.Close()
+	blob, err := proto.Marshal(&fileMetadata)
+	if err != nil {
+		log.Print(err)
+	}
+
+	err = ldb.Put([]byte(fmt.Sprintf("file_%v", fileMetadata.Uuid)), blob, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file metadata"})
+		return
+	}
+	ldb.Close()
+
+	// Return a success message and the file metadata
+	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully", "Details": fileMetadata})
+}
+
+func UploadFiles(c *gin.Context) {
+	/*
+		UploadFiles function handles the upload of multiple files.
+		It gets the files from the form data, saves each file to the defined path,
+		generates a unique identifier for each file, saves the file metadata to the database,
+		and returns a success message and the file metadata.
+	*/
+	// Get the files from the form data
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	files := form.File["files"]
+	var fileMetadata model.FileList
+	// Save each file to the defined path and generate a unique identifier for each file
+	dir := filepath.Join("Database", "assets")
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file directory"})
+			return
+		}
+	}
+	for i, file := range files {
+		filePath := filepath.Join(dir, file.Filename)
+		if err := c.SaveUploadedFile(file, filePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+			return
+		}
+		fileMetadata.Files[i] = &model.File{
+			Uuid:      pkg.GetUlid(),
+			Name:      file.Filename,
+			CreatedAt: time.Now().Unix(),
+			UpdatedAt: 0,
+			Hash:      pkg.FileHashGeneration(filePath),
+			MimeType:  file.Header.Get("Content-Type"),
+			Ext:       filepath.Ext(file.Filename),
+		}
+		// Save file metadata to database
+		fileMetadata.Files[i].Save()
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded successfully", "Details": fileMetadata})
+}
+
+// DownloadFile function handles the download of a single file.
+// It gets the file metadata from the database, gets the file from the defined path,
+// and returns the file.
+func DownloadFile(c *gin.Context) {
+	/*
+	   GetFile function retrieves a file from the server.
+	   It gets the unique identifier of the file to be retrieved,
+	   retrieves the file metadata from the database,
+	   defines the path of the file to be retrieved,
+	   opens the file, reads the first 512 bytes of the file to determine its content type,
+	   gets the file info, sets the headers for the file transfer, and returns the file.
+	*/
+	// Get the unique identifier of the file to be retrieved
+	ulid := c.Query("id")
+	var file model.File
+	// Retrieve the file metadata from the database
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file directory"})
+		return
+	}
+	defer ldb.Close()
+	blob, err := ldb.Get([]byte(fmt.Sprintf("file_%v", ulid)), nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get file metadata" + err.Error() + ulid})
+		return
+	}
+	err = proto.Unmarshal(blob, &file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get file metadata" + err.Error() + ulid})
+		return
+	}
+
+	// Define the path of the file to be retrieved
+	filePath := filepath.Join("Database", "assets", file.GetUuid())
+	// redirect to file
+	c.Redirect(http.StatusMovedPermanently, filePath)
+
+}
+
+// DownloadFiles function handles the download of multiple files.
+// It gets the file metadata from the database, gets the files from the defined path,
+// and returns the files.
+// func DownloadFiles(c *gin.Context) {
+// 	/*
+// 		GetFiles function retrieves multiple files from the server.
+// 		It gets the unique identifiers of the files to be retrieved,
+// 		retrieves the file metadata from the database,
+// 		defines the path of the files to be retrieved,
+// 		opens the files, reads the first 512 bytes of the files to determine their content type,
+// 		gets the files info, sets the headers for the files transfer, and returns the files.
+// 	*/
+// 	// Get the unique identifiers of the files to be retrieved
+// 	ulids := c.QueryArray("ulids")
+// 	var fileMetadata model.FileList
+// 	// Retrieve the file metadata from the database
+// 	fileMetadata.Get(ulids)
+// 	// Define the path of the files to be retrieved
+// 	dir := filepath.Join("Database", "assets")
+// 	// Open the files
+// 	for _, file := range fileMetadata.Files {
+// 		filePath := filepath.Join(dir, file.Name)
+// 		fileData, err := os.Open(filePath)
+// 		if err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+// 			return
+// 		}
+// 		defer fileData.Close()
+// 		// Read the first 512 bytes of the files to determine their content type
+// 		fileHeader := make([]byte, 512)
+// 		_, err = fileData.Read(fileHeader)
+// 		if err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file"})
+// 			return
+// 		}
+// 		// Get the files info
+// 		fileInfo, err := fileData.Stat()
+// 		if err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get file info"})
+// 			return
+// 		}
+// 		// Set the headers for the files transfer and return the files
+// 		c.Header("Content-Description", "File Transfer")
+// 		c.Header("Content-Transfer-Encoding", "binary")
+// 		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", file.Name))
+// 		c.Header("Content-Type", file.MimeType)
+// 		c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
+// 		fileData.Close()
+// 		c.File(filePath)
+// 	}
+// }
