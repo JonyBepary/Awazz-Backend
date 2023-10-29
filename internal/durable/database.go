@@ -32,7 +32,7 @@ func CreateDatabase(params ...string) (*sql.DB, error) {
 	}
 	return db, err
 }
-func LeveldbCreateDatabase(params ...string) (*leveldb.DB, error) {
+func LevelDBCreateDatabase(params ...string) (*leveldb.DB, error) {
 
 	// check if directory exists, create it if it doesn't
 	dir := path.Join(params[0])

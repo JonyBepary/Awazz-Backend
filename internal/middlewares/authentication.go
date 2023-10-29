@@ -24,5 +24,4 @@ func TokenGenerator(UserId, timeStamp, Server_seed string) string {
 	h.Write([]byte(Server_seed))
 	hash := hex.EncodeToString(h.Sum(nil))
 	return hash
-
 }

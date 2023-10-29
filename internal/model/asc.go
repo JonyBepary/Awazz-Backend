@@ -18,7 +18,7 @@ func (pk *AKS) WriteToDatabase(param ...string) error {
 	if len(param) > 1 {
 		filepath = param[0]
 	}
-	ldb, err := durable.LeveldbCreateDatabase(filepath)
+	ldb, err := durable.LevelDBCreateDatabase(filepath)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (pk *AKS) ReadToDatabase(param ...string) error {
 	if len(param) > 1 {
 		filepath = param[0]
 	}
-	ldb, err := durable.LeveldbCreateDatabase(filepath)
+	ldb, err := durable.LevelDBCreateDatabase(filepath)
 	if err != nil {
 		return err
 	}

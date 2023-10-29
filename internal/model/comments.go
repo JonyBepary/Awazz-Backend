@@ -10,7 +10,7 @@ import (
 // Comments is the database model for comments.
 func (cm *Comment) Get() error {
 	//leveldb get
-	db, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	db, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,7 @@ func (cm *Comment) Get() error {
 
 func (cm *Comment) Save() error {
 	//leveldb put
-	db, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	db, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (cm *Comment) Save() error {
 
 func GetNComments(postId string, N int) ([]*Comment, error) {
 	//leveldb get
-	db, err := durable.LeveldbCreateDatabase("Database/", "NOSQL", "/")
+	db, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		return nil, err
 	}
