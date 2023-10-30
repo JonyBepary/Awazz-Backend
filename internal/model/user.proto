@@ -3,12 +3,13 @@ syntax = "proto3";
 package model;
 option go_package = ".;model";
 message User{
-    string userName = 2;
-    string password = 3;
-    string email = 4;
-    string profilePicUrl = 5;
-    int64 accountTime = 6;
-    string birthDate = 7;
-    string gender = 8;
-    int64 lastEdit = 9;
-}
+        int32 user_id = 1;
+        string user_name = 2;
+        string password = 3;
+        string email = 4;
+        string profile_pic_url = 5;
+        int64 account_time = 6;
+        string birth_date = 7;
+        string gender = 8;
+        int64 last_edit = 9;
+    }

@@ -33,17 +33,19 @@ func (p *Person) SavePerson() error {
 	Outbox VARCHAR(255),
 	PreferredUsername VARCHAR(255),
 	PublicKey VARCHAR(255),
-	FragmentationKey VARCHAR(255)
+	FragmentationKey VARCHAR(255),
+	Username VARCHAR(255),
+	FOREIGN KEY (Username) REFERENCES USER(Username)
 )`
 	_, err = db.Exec(sql_cmd)
 	if err != nil {
 		return err
 	}
-	statement, err := db.Prepare("INSERT INTO PERSON (Id,Attachment,AttributedTo,Context,MediaType,EndTime,Generator,Icon,Image,InReplyTo,Location,Preview,PublishedTime,StartTime,Summary,UpdatedTime,Likes,Shares,Inbox,Outbox,PreferredUsername,PublicKey,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+	statement, err := db.Prepare("INSERT INTO PERSON (Id,Attachment,AttributedTo,Context,MediaType,EndTime,Generator,Icon,Image,InReplyTo,Location,Preview,PublishedTime,StartTime,Summary,UpdatedTime,Likes,Shares,Inbox,Outbox,PreferredUsername,PublicKey,FragmentationKey,Username) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		return err
 	}
-	_, err = statement.Exec(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.StartTime, p.Summary, p.UpdatedTime, p.Likes, p.Shares, p.Inbox, p.Outbox, p.PreferredUsername, p.PublicKey, p.FragmentationKey)
+	_, err = statement.Exec(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.StartTime, p.Summary, p.UpdatedTime, p.Likes, p.Shares, p.Inbox, p.Outbox, p.PreferredUsername, p.PublicKey, p.FragmentationKey, p.Username)
 	if err != nil {
 		return err
 	}
@@ -64,7 +66,7 @@ func (p *Person) GetPerson(pid string) error {
 		panic(err)
 	}
 	row.Next()
-	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
+	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey, &p.Username)
 	if err != nil {
 		panic(err)
 	}
@@ -79,86 +81,127 @@ func (p *Person) GetPerson(pid string) error {
 	return nil
 }
 
-// {
-// 	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer db.Close()
-// 	// spew.Dump(rows)
-// 	rows, err := db.Query("SELECT * FROM PERSON")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer rows.Close()
-// 	for rows.Next() {
-// 		err = rows.Scan(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.Replies, p.StartTime, p.Summary,  p.UpdatedTime, p.Url, p.Too, p.Bto, p.Cc, p.Bcc, p.Likes, p.Shares, p.Inbox, p.Outbox, p.Following, p.Followers, p.Liked, p.PreferredUsername, p.Endpoints, p.Streams, p.PublicKey, p.FragmentationKey)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-// 	}
-// 	err = rows.Err()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return nil
-// }
+func (p *Person) GetPersonByUsername(username string) error {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 
-// func GetPerson(msgId string) (Person, error) {
-// 	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer db.Close()
+	// spew.Dump(rows)
+	//! fmt.Println("message id is: ", pid)
+	row, err := db.Query("SELECT * FROM PERSON WHERE Username=?", username)
+	if err != nil {
+		panic(err)
+	}
+	row.Next()
+	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey, &p.Username)
+	if err != nil {
+		panic(err)
+	}
 
-// 	// spew.Dump(rows)
-// 	//! fmt.Println("message id is: ", msgId)
-// 	row, err := db.Query("SELECT * FROM PERSON WHERE Id=?", msgId)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	row.Next()
-// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary,  &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	err = row.Err()
+	if err != nil {
+		panic(err)
+	}
+	row.Close()
 
-// 	err = row.Err()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	row.Close()
+	//! spew.Dump(p.Id)
+	return nil
+}
 
-// 	//! spew.Dump(p.Id)
-// 	return nil
-// }
+func (p *Person) UpdatePerson() error {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	sql_cmd := `UPDATE PERSON SET Id=?,Attachment=?,AttributedTo=?,Context=?,MediaType=?,EndTime=?,Generator=?,Icon=?,Image=?,InReplyTo=?,Location=?,Preview=?,PublishedTime=?,StartTime=?,Summary=?,UpdatedTime=?,Likes=?,Shares=?,Inbox=?,Outbox=?,PreferredUsername=?,PublicKey=?,FragmentationKey=?,Username=? WHERE Id=?`
+	statement, err := db.Prepare(sql_cmd)
+	if err != nil {
+		panic(err)
+	}
+	_, err = statement.Exec(p.Id, p.Attachment, p.AttributedTo, p.Context, p.MediaType, p.EndTime, p.Generator, p.Icon, p.Image, p.InReplyTo, p.Location, p.Preview, p.PublishedTime, p.StartTime, p.Summary, p.UpdatedTime, p.Likes, p.Shares, p.Inbox, p.Outbox, p.PreferredUsername, p.PublicKey, p.FragmentationKey, p.Username, p.Id)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
 
-// func GetPerson(msgId string) (Person, error) {
-// 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer db.Close()
+func (p *Person) DeletePerson(pid string) error {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	sql_cmd := `DELETE FROM PERSON WHERE Id=?`
+	statement, err := db.Prepare(sql_cmd)
+	if err != nil {
+		panic(err)
+	}
+	_, err = statement.Exec(pid)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
 
-// 	// spew.Dump(rows)
-// 	//! fmt.Println("message id is: ", msgId)
-// 	row, err := db.Query("SELECT * FROM PERSON WHERE Id=?", msgId)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	p := Person{}
-// 	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey)
-// 	row.Next()
-// 	if err != nil {
-// 		panic(err)
-// 	}
+func (p *Person) GetPersonByFragmentationKey(fragmentationKey string) error {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 
-// 	err = row.Err()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	row.Close()
+	// spew.Dump(rows)
+	//! fmt.Println("message id is: ", pid)
+	row, err := db.Query("SELECT * FROM PERSON WHERE FragmentationKey=?", fragmentationKey)
+	if err != nil {
+		panic(err)
+	}
+	row.Next()
+	err = row.Scan(&p.Id, &p.Attachment, &p.AttributedTo, &p.Context, &p.MediaType, &p.EndTime, &p.Generator, &p.Icon, &p.Image, &p.InReplyTo, &p.Location, &p.Preview, &p.PublishedTime, &p.Replies, &p.StartTime, &p.Summary, &p.UpdatedTime, &p.Url, &p.Too, &p.Bto, &p.Cc, &p.Bcc, &p.Likes, &p.Shares, &p.Inbox, &p.Outbox, &p.Following, &p.Followers, &p.Liked, &p.PreferredUsername, &p.Endpoints, &p.Streams, &p.PublicKey, &p.FragmentationKey, &p.Username)
+	if err != nil {
+		panic(err)
+	}
 
-// 	//! spew.Dump(p.Id)
-// 	return p, nil
-// }
+	err = row.Err()
+	if err != nil {
+		panic(err)
+	}
+	row.Close()
+
+	//! spew.Dump(p.Id)
+	return nil
+}
+
+// horizontally fragment this table by location
+func (p *Person) FragmentateByLocation() ([]Person, error) {
+	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM PERSON WHERE Location=?", p.Location)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var persons []Person
+	for rows.Next() {
+		var person Person
+		err = rows.Scan(&person.Id, &person.Attachment, &person.AttributedTo, &person.Context, &person.MediaType, &person.EndTime, &person.Generator, &person.Icon, &person.Image, &person.InReplyTo, &person.Location, &person.Preview, &person.PublishedTime, &person.Replies, &person.StartTime, &person.Summary, &person.UpdatedTime, &person.Url, &person.Too, &person.Bto, &person.Cc, &person.Bcc, &person.Likes, &person.Shares, &person.Inbox, &person.Outbox, &person.Following, &person.Followers, &person.Liked, &person.PreferredUsername, &person.Endpoints, &person.Streams, &person.PublicKey, &person.FragmentationKey, &person.Username)
+		if err != nil {
+			return nil, err
+		}
+		persons = append(persons, person)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return persons, nil
+}
+

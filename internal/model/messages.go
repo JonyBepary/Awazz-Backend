@@ -16,9 +16,9 @@ func (msg *Messages) SaveMessages() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS MESSAGE (
-		MsgId VARCHAR(128) PRIMARY KEY,
-		SenderId  VARCHAR(128),
-		ReceiverId  VARCHAR(128),
+		MsgId VARCHAR(255) PRIMARY KEY,
+		SenderId  VARCHAR(255),
+		ReceiverId  VARCHAR(255),
 		Content TEXT,
 		SentTime INTEGER,
 		LastEdit INTEGER,

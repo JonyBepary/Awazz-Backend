@@ -17,14 +17,14 @@ func (n *Notifications) SaveNotifications() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS NOTIFICATIONS (
-	Receiver VARCHAR(128) PRIMARY KEY NOT NULL,
-	Title VARCHAR(128),
-    Body VARCHAR(128),
-    Source VARCHAR(128),
-    Image VARCHAR(128),
-    Sound VARCHAR(128),
+	Receiver VARCHAR(255) PRIMARY KEY NOT NULL,
+	Title VARCHAR(255),
+    Body VARCHAR(255),
+    Source VARCHAR(255),
+    Image VARCHAR(255),
+    Sound VARCHAR(255),
     Time INTEGER,
-    Channel VARCHAR(128),
+    Channel VARCHAR(255),
     PriorityLevel INTEGER,
     ReadStatus bool,
     Created INTEGER)

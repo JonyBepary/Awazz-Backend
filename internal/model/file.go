@@ -13,7 +13,7 @@ func (s *File) Save() error {
 	}
 	defer db.Close()
 	str := `CREATE TABLE IF NOT EXISTS FILE(
-		ULID VARCHAR(128) PRIMARY KEY,
+		ULID VARCHAR(255) PRIMARY KEY,
 		Name TEXT NOT NULL,
 		CreatedAt INTEGER NOT NULL,
 		UpdatedAt INTEGER,

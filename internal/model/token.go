@@ -15,8 +15,8 @@ func (s *Token) SaveToken() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS TOKEN (
-		UserName VARCHAR(128) PRIMARY KEY,
-		Token  VARCHAR(128),
+		UserName VARCHAR(255) PRIMARY KEY,
+		Token  VARCHAR(255),
 		GenerateTime INTEGER)
 	`
 	_, err = db.Exec(str)

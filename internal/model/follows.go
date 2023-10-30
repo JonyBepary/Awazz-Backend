@@ -19,11 +19,11 @@ func (s *Follower) SaveFollower() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS Follower (
-		UserId VARCHAR(128) PRIMARY KEY,
+		UserId VARCHAR(255) PRIMARY KEY,
 		Status  BOOL,
 		Time  INTEGER,
-		FollowAccount VARCHAR(128),
-		UnfollowAccount VARCHAR(128)
+		FollowAccount VARCHAR(255),
+		UnfollowAccount VARCHAR(255)
 	)
 
 		`
@@ -102,7 +102,7 @@ func (d *Follower) DeleteFollowee(FolloweeId string) error {
 	// another rule don't type something that can be copied
 	// typing on your own tends to bring more mistake
 	// baki table check koro okay): abar thik ache bhai
-	_, err = db.Exec("DELETE FROM  Follower WHERE  UserId= ?", FolloweeId)  /// mair khabatable name thik koroe
+	_, err = db.Exec("DELETE FROM  Follower WHERE  UserId= ?", FolloweeId) /// mair khabatable name thik koroe
 
 	if err != nil {
 		log.Fatal(err)
@@ -122,7 +122,7 @@ func (s *Followee) SaveFollowee() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS Followee (
-		UserId VARCHAR(128) PRIMARY KEY,
+		UserId VARCHAR(255) PRIMARY KEY,
 		BlockAccountLink TEXT,
 		BlockAccountName TEXT
 	)

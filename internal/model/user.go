@@ -17,9 +17,9 @@ func (s *User) SaveUserData() error {
 	defer db.Close()
 	str := `
 	CREATE TABLE IF NOT EXISTS USER (
-			UserName VARCHAR(128) PRIMARY KEY ,
-			Password VARCHAR(128) NOT NULL,
-			Email VARCHAR(128) ,
+			UserName VARCHAR(255) PRIMARY KEY ,
+			Password VARCHAR(255) NOT NULL,
+			Email VARCHAR(255) ,
 			ProfilePicUrl TEXT ,
 			AccountTime INTEGER,
 			BirthDate TEXT ,
@@ -73,9 +73,9 @@ func (g *User) GetUserData(userName string) error {
 
 	return nil
 }
+
 // previous data first before calling this
 func (u *User) UpdatedUserData(UserName string) error {
-
 
 	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
 	if err != nil {

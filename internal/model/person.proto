@@ -41,6 +41,7 @@ message Person {
     string streams = 39;
     string publicKey = 40;
     string fragmentationKey = 41;
+    string username = 42;
 }
 
 
