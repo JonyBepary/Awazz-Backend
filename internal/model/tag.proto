@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package model;
+option go_package = ".;model";
+
+message tags {
+    string id = 1;
+    string type = 2;
+    repeated string tag = 3;
+}
