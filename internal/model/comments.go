@@ -44,6 +44,45 @@ func (cm *Comment) Save() error {
 	return nil
 }
 
+func (cm *Comment) Delete() error {
+	//leveldb put
+	db, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	err = db.Delete([]byte(fmt.Sprintf("comment-%v-%v", cm.PostId, cm.Id)), nil)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+func (cm *Comment) Update() error {
+	//leveldb put
+	db, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	data, err := proto.Marshal(cm)
+	if err != nil {
+		return err
+	}
+	err = db.Delete([]byte(fmt.Sprintf("comment-%v-%v", cm.PostId, cm.Id)), nil)
+	if err != nil {
+		return err
+	}
+
+	err = db.Put([]byte(fmt.Sprintf("comment-%v-%v", cm.PostId, cm.Id)), data, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
 func GetNComments(postId string, N int) ([]*Comment, error) {
 	//leveldb get
 	db, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")

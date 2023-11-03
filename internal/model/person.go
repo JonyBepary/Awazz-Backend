@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func (p *Person) SavePerson() error {
@@ -134,8 +135,9 @@ func (p *Person) DeletePerson(pid string) error {
 		panic(err)
 	}
 	defer db.Close()
-	sql_cmd := `DELETE FROM PERSON WHERE Id=?`
-	statement, err := db.Prepare(sql_cmd)
+	spew.Dump(pid)
+	//prepare statement
+	statement, err := db.Prepare("DELETE FROM PERSON WHERE Id=?")
 	if err != nil {
 		panic(err)
 	}
@@ -143,6 +145,7 @@ func (p *Person) DeletePerson(pid string) error {
 	if err != nil {
 		panic(err)
 	}
+
 	return nil
 }
 
@@ -204,4 +207,3 @@ func (p *Person) FragmentateByLocation() ([]Person, error) {
 	}
 	return persons, nil
 }
-

@@ -68,7 +68,7 @@ func check_login(c *gin.Context) error {
 }
 
 // login handles user login requests.
-// It takes a gin.Context object as input and retrieves the username and password from the query parameters.
+// It takes a gin.Context object as input and retrieves the username and password from the query Queryeters.
 // If either the username or password is missing, it returns a 401 error.
 // It then checks if the user exists in the database and retrieves the user object.
 // If the password is incorrect, it returns a 401 error.
@@ -220,7 +220,7 @@ func getPost(c *gin.Context) {
 	}
 
 	var post model.Post
-	post.Id = c.Param("id")
+	post.Id = c.Query("Id")
 	// err := post.GetPost(post.Id)
 	// if err != nil {
 	// 	c.JSON(500, gin.H{"error": err.Error()})
@@ -243,6 +243,38 @@ func getPost(c *gin.Context) {
 		return
 	}
 	c.JSON(200, post)
+}
+
+// delPost function deletes the post object from the database and returns the post object.
+func delPost(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
+	var post model.Post
+	post.Id = c.Query("Id")
+	err := post.DeletePost(post.Id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("post_%v", post.Id)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Post Deleted")
 }
 
 // savePost function saves the post object to the LevelDB database and returns the saved post object.
@@ -313,6 +345,37 @@ func getPerson(c *gin.Context) {
 		return
 	}
 	c.JSON(200, p)
+}
+
+func delPerson(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
+	var person model.Person
+	person.Id = c.Query("Id")
+	err := person.DeletePerson(person.Id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("person_%v", person.Id)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Person Deleted")
 }
 
 // savePerson function saves the person object to the LevelDB database and returns the saved person object.
@@ -460,6 +523,33 @@ func getCommunity(c *gin.Context) {
 
 	c.JSON(200, p)
 }
+func delCommunity(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+	}
+	var community model.Community
+	community.Id = c.Query("Id")
+	err := community.DeleteCommunity(community.Id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("community_%v", community.Id)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Community Deleted")
+}
 
 // saveCommunity function saves the community object to the LevelDB database and returns the saved community object.
 // It takes a gin.Context object as input and binds the community object to it. It then creates a LevelDB database and saves the community object to it.
@@ -547,6 +637,35 @@ func getInstance(c *gin.Context) {
 	ldb.Close()
 	c.JSON(200, p)
 }
+func delInstance(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+
+	}
+	var instance model.Instance
+	instance.Id = c.Query("Id")
+	err := instance.DeleteInstance(instance.Id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("instance_%v", instance.Id)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Instance Deleted")
+}
 
 func saveComment(c *gin.Context) {
 
@@ -601,6 +720,31 @@ func getComment(c *gin.Context) {
 	}
 
 	c.JSON(200, p)
+}
+
+func delComment(c *gin.Context) {
+	var comment model.Comment
+	comment.Id = c.Query("cid")
+	comment.PostId = c.Query("pid")
+	err := comment.Delete()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("comment_%v", comment.Id)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Comment Deleted")
 }
 
 func saveMessage(c *gin.Context) {
@@ -676,6 +820,38 @@ func getMessage(c *gin.Context) {
 	c.JSON(200, p)
 }
 
+func delMessage(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
+	var p model.Messages
+	p.MsgId = c.Query("MsgId")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("message_%v", p.MsgId)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ldb.Close()
+
+	err = p.DeleteMessages(p.MsgId)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Message Deleted")
+}
+
 func saveNotification(c *gin.Context) {
 
 	// check if user is logged in
@@ -726,7 +902,7 @@ func getNotification(c *gin.Context) {
 	}
 
 	var p model.Notifications
-	notification_id := c.Query("NotificationId")
+	notification_id := c.Query("Receiver")
 	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -747,6 +923,37 @@ func getNotification(c *gin.Context) {
 
 	ldb.Close()
 	c.JSON(200, p)
+}
+func delNotification(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+
+	var p model.Notifications
+	notification_id := c.Query("NotificationId")
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("notification_%v", notification_id)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ldb.Close()
+
+	err = p.DeleteNotifications(notification_id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Notification Deleted")
 }
 
 func saveFollower(c *gin.Context) {
@@ -821,6 +1028,35 @@ func getFollower(c *gin.Context) {
 	ldb.Close()
 	c.JSON(200, p)
 }
+func delFollower(c *gin.Context) {
+
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+
+	}
+	var follower model.Follower
+	follower.UserId = c.Query("UserId")
+	err := follower.DeleteFollowee(follower.UserId)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("follower_%v", follower.UserId)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, "Followee Deleted")
+}
 func saveFollowee(c *gin.Context) {
 
 	// check if user is logged in
@@ -894,73 +1130,31 @@ func getFollowee(c *gin.Context) {
 	c.JSON(200, p)
 }
 
-func saveLikes(c *gin.Context) {
-
-	// check if user is logged in
-	if err := check_login(c); err != nil {
-		c.JSON(401, gin.H{"authentication error": err.Error()})
-		return
-	}
-
-	p := model.Likes{}
-	err := c.Bind(&p)
-	if err != nil {
-		println(err.Error())
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	// PRINT instance OBJECT TO CONSOLE INTENDED FOR DEBUGGING
-	// spew.Config.Indent = "\t"
-	// spew.Dump(p)
-
-	// Save instance in sqlite database
-	err = p.SaveLikes()
+func delFollowee(c *gin.Context) {
+	var followee model.Followee
+	followee.UserId = c.Query("UserId")
+	err := followee.DeleteFollower(followee.UserId)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	// CREATING LEVELDB DATABASE
-	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
-	if err != nil {
-		panic(err)
-	}
-	defer ldb.Close()
-	blob, err := proto.Marshal(&p)
-	if err != nil {
-		log.Print(err)
-	}
-	ldb.Put([]byte(fmt.Sprintf("like_%v", p.UserId)), blob, nil)
-	ldb.Close()
-	c.JSON(200, p)
-
-}
-
-func getLikes(c *gin.Context) {
-
-	// check if user is logged in
-	if err := check_login(c); err != nil {
-		c.JSON(401, gin.H{"authentication error": err.Error()})
-		return
-	}
-
-	p := model.Likes{}
 	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
-		return
+
 	}
 	defer ldb.Close()
-	blob, err := ldb.Get([]byte(fmt.Sprintf("like_%v", p.UserId)), nil)
+	err = ldb.Delete([]byte(fmt.Sprintf("followee_%v", followee.UserId)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	proto.Unmarshal(blob, &p)
-	ldb.Close()
-	c.JSON(200, p)
+
+	c.JSON(200, "Followee Deleted")
 }
-func UploadFile(c *gin.Context) {
+
+func uploadFile(c *gin.Context) {
 	/*
 	  UploadFile function handles the upload of a single file.
 	  It gets the file from the form data, saves it to the defined path,
@@ -973,7 +1167,7 @@ func UploadFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	uuid := pkg.GetUlid()
+	ulid := pkg.GetUlid()
 	dir := filepath.Join("Database", "assets")
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		if err := os.MkdirAll(dir, 0755); err != nil {
@@ -982,7 +1176,7 @@ func UploadFile(c *gin.Context) {
 		}
 	}
 	// Define the path where the file will be saved
-	filePath := filepath.Join(dir, uuid)
+	filePath := filepath.Join(dir, ulid)
 	// Save the file to the defined path
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
@@ -991,7 +1185,7 @@ func UploadFile(c *gin.Context) {
 
 	// Save file metadata to database
 	fileMetadata := model.File{
-		Uuid:      uuid,
+		Uuid:      ulid,
 		Name:      file.Filename,
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: 0,
@@ -1006,7 +1200,7 @@ func UploadFile(c *gin.Context) {
 	}
 	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file directory"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open Database directory"})
 		return
 	}
 	defer ldb.Close()
@@ -1025,8 +1219,49 @@ func UploadFile(c *gin.Context) {
 	// Return a success message and the file metadata
 	c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully", "Details": fileMetadata})
 }
+func deleteFile(c *gin.Context) {
+	/*
+		DeleteFile function handles the deletion of a single file.
+		It gets the unique identifier of the file to be deleted,
+		deletes the file from the defined path, deletes the file metadata from the database,
+		and returns a success message.
+	*/
+	// Get the unique identifier of the file to be deleted
+	ulid := c.Query("ulid")
+	f := model.File{
+		Uuid: ulid,
+	}
+	// Define the path of the file to be deleted
+	filePath := filepath.Join("Database", "assets", ulid)
+	spew.Dump(filePath)
+	spew.Dump(ulid)
+	// Delete the file from the defined path
+	if err := os.Remove(filePath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "1Failed to delete file"})
+		return
+	}
+	err := f.Delete(ulid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "3Failed to open Database directory"})
+		return
+	}
 
-func UploadFiles(c *gin.Context) {
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "3Failed to open Database directory"})
+		return
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("file_%v", ulid)), nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "4Failed to delete file metadata"})
+		return
+	}
+	ldb.Close()
+	// Return a success message
+	c.JSON(http.StatusOK, gin.H{"message": "File deleted successfully"})
+}
+func uploadFiles(c *gin.Context) {
 	/*
 		UploadFiles function handles the upload of multiple files.
 		It gets the files from the form data, saves each file to the defined path,
@@ -1070,10 +1305,52 @@ func UploadFiles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded successfully", "Details": fileMetadata})
 }
 
+func deleteFiles(c *gin.Context) {
+	/*
+		DeleteFiles function handles the deletion of multiple files.
+		It gets the unique identifiers of the files to be deleted,
+		deletes the files from the defined path, deletes the file metadata from the database,
+		and returns a success message.
+	*/
+	// Get the unique identifiers of the files to be deleted
+	ulids := c.QueryArray("ulids")
+	// Define the path of the files to be deleted
+	for _, ulid := range ulids {
+		filePath := filepath.Join("Database", "assets", ulid)
+		// Delete the files from the defined path
+		if err := os.Remove(filePath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete file"})
+			return
+		}
+		// Delete file metadata from database
+		// REMOVE FILE USING SYSTEM
+		err := os.Remove(filePath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete file"})
+			return
+		}
+
+		ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open Database directory"})
+			return
+		}
+		defer ldb.Close()
+		err = ldb.Delete([]byte(fmt.Sprintf("file_%v", ulid)), nil)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete file metadata"})
+			return
+		}
+		ldb.Close()
+	}
+	// Return a success message
+	c.JSON(http.StatusOK, gin.H{"message": "Files deleted successfully"})
+}
+
 // DownloadFile function handles the download of a single file.
 // It gets the file metadata from the database, gets the file from the defined path,
 // and returns the file.
-func DownloadFile(c *gin.Context) {
+func downloadFile(c *gin.Context) {
 	/*
 	   GetFile function retrieves a file from the server.
 	   It gets the unique identifier of the file to be retrieved,
@@ -1088,7 +1365,7 @@ func DownloadFile(c *gin.Context) {
 	// Retrieve the file metadata from the database
 	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file directory"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open Database directory"})
 		return
 	}
 	defer ldb.Close()
@@ -1110,54 +1387,188 @@ func DownloadFile(c *gin.Context) {
 
 }
 
-// DownloadFiles function handles the download of multiple files.
-// It gets the file metadata from the database, gets the files from the defined path,
-// and returns the files.
-// func DownloadFiles(c *gin.Context) {
-// 	/*
-// 		GetFiles function retrieves multiple files from the server.
-// 		It gets the unique identifiers of the files to be retrieved,
-// 		retrieves the file metadata from the database,
-// 		defines the path of the files to be retrieved,
-// 		opens the files, reads the first 512 bytes of the files to determine their content type,
-// 		gets the files info, sets the headers for the files transfer, and returns the files.
-// 	*/
-// 	// Get the unique identifiers of the files to be retrieved
-// 	ulids := c.QueryArray("ulids")
-// 	var fileMetadata model.FileList
-// 	// Retrieve the file metadata from the database
-// 	fileMetadata.Get(ulids)
-// 	// Define the path of the files to be retrieved
-// 	dir := filepath.Join("Database", "assets")
-// 	// Open the files
-// 	for _, file := range fileMetadata.Files {
-// 		filePath := filepath.Join(dir, file.Name)
-// 		fileData, err := os.Open(filePath)
-// 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
-// 			return
-// 		}
-// 		defer fileData.Close()
-// 		// Read the first 512 bytes of the files to determine their content type
-// 		fileHeader := make([]byte, 512)
-// 		_, err = fileData.Read(fileHeader)
-// 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file"})
-// 			return
-// 		}
-// 		// Get the files info
-// 		fileInfo, err := fileData.Stat()
-// 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get file info"})
-// 			return
-// 		}
-// 		// Set the headers for the files transfer and return the files
-// 		c.Header("Content-Description", "File Transfer")
-// 		c.Header("Content-Transfer-Encoding", "binary")
-// 		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", file.Name))
-// 		c.Header("Content-Type", file.MimeType)
-// 		c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
-// 		fileData.Close()
-// 		c.File(filePath)
-// 	}
-// }
+func saveLike(c *gin.Context) {
+
+	// check if user is logged in
+	// if err := check_login(c); err != nil {
+	// 	c.JSON(401, gin.H{"authentication error": err.Error()})
+	// 	return
+	// }
+
+	p := model.Like{}
+	err := c.Bind(&p)
+	if err != nil {
+		println(err.Error())
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	// PRINT instance OBJECT TO CONSOLE INTENDED FOR DEBUGGING
+	// spew.Config.Indent = "\t"
+	// spew.Dump(p)
+
+	// Save instance in sqlite database
+	err = p.SaveLikes()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	// CREATING LEVELDB DATABASE
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		panic(err)
+	}
+	defer ldb.Close()
+	blob, err := proto.Marshal(&p)
+	if err != nil {
+		log.Print(err)
+	}
+	ldb.Put([]byte(fmt.Sprintf("like_%v_%v)", p.UserId, p.EntityId)), blob, nil)
+	ldb.Put([]byte(fmt.Sprintf("like_%v_%v)", p.EntityId, p.UserId)), blob, nil)
+	ldb.Close()
+	c.JSON(200, p)
+}
+
+func getLike(c *gin.Context) {
+
+	// check if user is logged in
+	// if err := check_login(c); err != nil {
+	// 	c.JSON(401, gin.H{"authentication error": err.Error()})
+	// 	return
+	// }
+
+	UserID := c.Query("UserId")
+	EntityId := c.Query("EntityId")
+	if EntityId == "" || UserID == "" {
+		c.JSON(500, gin.H{"error": errors.New("Query is empty")})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	blob, err := ldb.Get([]byte(fmt.Sprintf("like_%v_%v", UserID, EntityId)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	var p *model.Like
+	proto.Unmarshal(blob, p)
+	c.JSON(200, p)
+}
+func delLike(c *gin.Context) {
+	UserID := c.Query("UserId")
+	EntityId := c.Query("EntityId")
+	if EntityId == "" || UserID == "" {
+		c.JSON(500, gin.H{"error": errors.New("Query is empty")})
+		return
+	}
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	defer ldb.Close()
+	err = ldb.Delete([]byte(fmt.Sprintf("like_%v_%v", UserID, EntityId)), nil)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	p := model.Like{
+		UserId:   UserID,
+		EntityId: EntityId,
+	}
+	err = p.Delete()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Like deleted successfully"})
+}
+
+func getLIKESByUserId(c *gin.Context) {
+	/*
+		likeEntity function handles the liking of a Entity.
+		It gets the Entity ID from the form data, gets the user ID from the session,
+		checks if the user has already liked the Entity, and returns a success message.
+	*/
+	// // check if user is logged in
+	// if err := check_login(c); err != nil {
+	// 	c.JSON(401, gin.H{"authentication error": err.Error()})
+	// 	return
+	// }
+	// Get the Entity ID from the form data
+	user_id := c.Query("UserId")
+	// Get the user ID from the session
+	likes := model.Likes{}
+	err := likes.GetByUserId(user_id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return a success message
+	c.JSON(http.StatusOK, gin.H{"Details": likes.Likes})
+}
+
+func getLIKESByEntityId(c *gin.Context) {
+	/*
+		likeEntity function handles the liking of a Entity.
+		It gets the Entity ID from the form data, gets the user ID from the session,
+		checks if the user has already liked the Entity, and returns a success message.
+	*/
+	// check if user is logged in
+	// if err := check_login(c); err != nil {
+	// 	c.JSON(401, gin.H{"authentication error": err.Error()})
+	// 	return
+	// }
+	// Get the Entity ID from the form data
+	entity_id := c.Query("EntityId")
+	// Get the user ID from the session
+	likes := model.Likes{}
+	err := likes.GetByEntityId(entity_id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Make a copy of the likes object before passing it to the JSON response
+	// likesCopy := make([]*model.Like, len(likes.Likes))
+	// copy(likesCopy, likes.Likes)
+
+	// Return a success message
+	c.JSON(http.StatusOK, gin.H{"Details": likes.Likes})
+
+}
+
+func setLikeByEntityId(c *gin.Context) {
+	/*
+		likeEntity function handles the liking of a Entity.
+		It gets the Entity ID from the form data, gets the user ID from the session,
+		checks if the user has already liked the Entity, and returns a success message.
+	*/
+	// check if user is logged in
+	if err := check_login(c); err != nil {
+		c.JSON(401, gin.H{"authentication error": err.Error()})
+		return
+	}
+	// Get the Entity ID from the form data
+	entity_id := c.Query("entity_id")
+	user_id := c.Query("user_id")
+	// Get the user ID from the session
+	v := model.Like{EntityId: entity_id, UserId: user_id, CreatedAt: time.Now().Unix()}
+	err := v.SaveLikes()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return a success message
+	c.JSON(http.StatusOK, gin.H{"message": "Entity liked successfully", "Details": v})
+}

@@ -4,9 +4,14 @@ package model;
 option go_package = ".;model";
 // import "google/protobuf/timestamp.proto";
 
-message Likes {
-    repeated string post_id = 1;
-    repeated string user_id = 2;
-    repeated string comment_id = 3;
+message Like {
+    string entity_id = 1;
+    string user_id = 2;
+    // repeated string comment_id = 3;
     int64 created_at = 4;
+}
+
+// likes
+message Likes {
+    repeated Like likes = 1;
 }

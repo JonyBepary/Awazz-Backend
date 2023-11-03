@@ -12,4 +12,5 @@ message User{
         string birth_date = 7;
         string gender = 8;
         int64 last_edit = 9;
-    }
+        string phone_number = 10;
+}
