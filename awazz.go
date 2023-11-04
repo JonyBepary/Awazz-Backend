@@ -10,6 +10,7 @@ func main() {
 	r.GET("/post", getPost)
 	r.POST("/post", savePost)
 	r.DELETE("/post", delPost)
+	r.GET("/posts_n", getNpost)
 	r.GET("/person", getPerson)
 	r.POST("/person", savePerson)
 	r.DELETE("/person", delPerson)
@@ -47,7 +48,6 @@ func main() {
 	r.POST("/files", uploadFiles)
 	r.DELETE("/files", deleteFiles)
 	r.Static("/Database/assets/", "./Database/assets/")
-
 
 	r.Run(":9091")
 }

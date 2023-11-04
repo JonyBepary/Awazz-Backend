@@ -53,11 +53,3 @@ func LevelDBCreateDatabase(params ...string) (*leveldb.DB, error) {
 
 	return db, err
 }
-
-func SetColumn(col, col_types []string) string {
-	STR := ""
-	for i := 0; i < len(col); i++ {
-		STR += fmt.Sprintf("%v %v, ", col[i], col_types[i])
-	}
-	return STR[:len(STR)-2]
-}

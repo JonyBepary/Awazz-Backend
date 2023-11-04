@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
@@ -16,6 +17,7 @@ import (
 	"github.com/SohelAhmedJoni/Awazz-Backend/pkg"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
+	"github.com/syndtr/goleveldb/leveldb/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -161,7 +163,7 @@ func register(c *gin.Context) {
 	}
 	// PRINT user OBJECT TO CONSOLE INTENDED FOR DEBUGGING
 	spew.Config.Indent = "\t"
-	spew.Dump(u)
+	// spew.Dump(u)
 
 	if u.UserName == "" {
 		// UserId is missing, return 401
@@ -206,7 +208,7 @@ func register(c *gin.Context) {
 	}
 	ldb.Close()
 
-	c.JSON(200, u)
+	c.JSON(200, &u)
 
 }
 
@@ -242,7 +244,54 @@ func getPost(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, post)
+	c.JSON(200, &post)
+}
+func getNpost(c *gin.Context) {
+	var n int
+	res := c.Query("num_posts")
+	var err error
+	n = func() int {
+		if res == "" {
+			return 100
+		}
+		n, err = strconv.Atoi(res)
+		if err != nil {
+
+			c.JSON(500, gin.H{"error": err.Error()})
+			return 0
+		}
+		return n
+	}()
+
+	posts := make([]model.Post, n)
+
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+
+	}
+	defer ldb.Close()
+	iter := ldb.NewIterator(util.BytesPrefix([]byte("post_")), nil)
+	i := 0
+	for iter.Next() {
+		err = proto.Unmarshal(iter.Value(), &posts[i])
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		if i == 100 {
+			break
+		}
+		i++
+	}
+	iter.Release()
+	err = iter.Error()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	res_posts := posts[:i]
+	c.JSON(200, res_posts)
 }
 
 // delPost function deletes the post object from the database and returns the post object.
@@ -287,7 +336,7 @@ func savePost(c *gin.Context) {
 	}
 
 	var post model.Post
-	err := c.BindJSON(&post)
+	err := c.Bind(&post)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -307,7 +356,7 @@ func savePost(c *gin.Context) {
 		log.Print(err)
 	}
 	lbd.Put([]byte(fmt.Sprintf("post_%v", post.Id)), blob, nil)
-	c.JSON(200, post)
+	c.JSON(200, &post)
 }
 
 // getPerson function gets the person object from the LevelDB database and returns the person object.
@@ -344,7 +393,7 @@ func getPerson(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func delPerson(c *gin.Context) {
@@ -426,7 +475,7 @@ func savePerson(c *gin.Context) {
 		log.Print(err)
 	}
 	ldb.Put([]byte(fmt.Sprintf("person_%v", person.Id)), blob, nil)
-	c.JSON(200, fmt.Sprintf("%+v", person))
+	c.JSON(200, fmt.Sprintf("%+v", &person))
 }
 
 // saveCommunity function saves the community object to the LevelDB database and returns the saved community object.
@@ -488,7 +537,7 @@ func saveCommunity(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, fmt.Sprintf("%+v", community))
+	c.JSON(200, fmt.Sprintf("%+v", &community))
 }
 
 func getCommunity(c *gin.Context) {
@@ -521,7 +570,7 @@ func getCommunity(c *gin.Context) {
 	}
 	spew.Dump(p)
 
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 func delCommunity(c *gin.Context) {
 
@@ -600,7 +649,7 @@ func saveInstance(c *gin.Context) {
 	}
 	ldb.Put([]byte(fmt.Sprintf("instance_%v", p.Id)), blob, nil)
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 // func saveCommunity(c *gin.Context) {
@@ -635,7 +684,7 @@ func getInstance(c *gin.Context) {
 	}
 
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 func delInstance(c *gin.Context) {
 
@@ -697,7 +746,7 @@ func saveComment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func getComment(c *gin.Context) {
@@ -719,7 +768,7 @@ func getComment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func delComment(c *gin.Context) {
@@ -785,7 +834,7 @@ func saveMessage(c *gin.Context) {
 	}
 	ldb.Put([]byte(fmt.Sprintf("message_%v", p.MsgId)), blob, nil)
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func getMessage(c *gin.Context) {
@@ -817,7 +866,7 @@ func getMessage(c *gin.Context) {
 	}
 
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func delMessage(c *gin.Context) {
@@ -890,7 +939,7 @@ func saveNotification(c *gin.Context) {
 	}
 	ldb.Put([]byte(fmt.Sprintf("notification_%v", p.Source)), blob, nil)
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func getNotification(c *gin.Context) {
@@ -922,7 +971,7 @@ func getNotification(c *gin.Context) {
 	}
 
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 func delNotification(c *gin.Context) {
 
@@ -994,7 +1043,7 @@ func saveFollower(c *gin.Context) {
 	}
 	ldb.Put([]byte(fmt.Sprintf("follower_%v", p.UserId)), blob, nil)
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func getFollower(c *gin.Context) {
@@ -1026,7 +1075,7 @@ func getFollower(c *gin.Context) {
 	}
 
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 func delFollower(c *gin.Context) {
 
@@ -1095,7 +1144,7 @@ func saveFollowee(c *gin.Context) {
 	}
 	ldb.Put([]byte(fmt.Sprintf("followee_%v", p.UserId)), blob, nil)
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func getFollowee(c *gin.Context) {
@@ -1127,7 +1176,7 @@ func getFollowee(c *gin.Context) {
 	}
 
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func delFollowee(c *gin.Context) {
@@ -1237,7 +1286,7 @@ func deleteFile(c *gin.Context) {
 	spew.Dump(ulid)
 	// Delete the file from the defined path
 	if err := os.Remove(filePath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "1Failed to delete file"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete file"})
 		return
 	}
 	err := f.Delete(ulid)
@@ -1248,7 +1297,7 @@ func deleteFile(c *gin.Context) {
 
 	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "3Failed to open Database directory"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open Database directory"})
 		return
 	}
 	defer ldb.Close()
@@ -1426,7 +1475,7 @@ func saveLike(c *gin.Context) {
 	ldb.Put([]byte(fmt.Sprintf("like_%v_%v)", p.UserId, p.EntityId)), blob, nil)
 	ldb.Put([]byte(fmt.Sprintf("like_%v_%v)", p.EntityId, p.UserId)), blob, nil)
 	ldb.Close()
-	c.JSON(200, p)
+	c.JSON(200, &p)
 }
 
 func getLike(c *gin.Context) {
