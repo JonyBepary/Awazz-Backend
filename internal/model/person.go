@@ -1,18 +1,23 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 	"github.com/davecgh/go-spew/spew"
 )
 
-func (p *Person) SavePerson() error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) SavePerson(frag_num int64) error {
+
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		return err
 	}
 	defer db.Close()
+
 	sql_cmd := `CREATE TABLE IF NOT EXISTS PERSON (
 	Id VARCHAR(255) PRIMARY KEY,
+	Location VARCHAR(255),
 	Attachment VARCHAR(255),
 	AttributedTo VARCHAR(255),
 	Context VARCHAR(255),
@@ -22,7 +27,6 @@ func (p *Person) SavePerson() error {
 	Icon VARCHAR(255),
 	Image VARCHAR(255),
 	InReplyTo VARCHAR(255),
-	Location VARCHAR(255),
 	Preview VARCHAR(255),
 	PublishedTime INTEGER,
 	StartTime INTEGER,
@@ -53,8 +57,10 @@ func (p *Person) SavePerson() error {
 	return nil
 }
 
-func (p *Person) GetPerson(pid string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) GetPerson(pid string, frag_num int64) error {
+
+	// save fragmentation to file
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -82,8 +88,9 @@ func (p *Person) GetPerson(pid string) error {
 	return nil
 }
 
-func (p *Person) GetPersonByUsername(username string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) GetPersonByUsername(username string, frag_num int64) error {
+	//! need to be fixed fragmentation
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -111,11 +118,14 @@ func (p *Person) GetPersonByUsername(username string) error {
 	return nil
 }
 
-func (p *Person) UpdatePerson() error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) UpdatePerson(frag_num int64) error {
+
+	// save fragmentation to file
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
+
 	defer db.Close()
 	sql_cmd := `UPDATE PERSON SET Id=?,Attachment=?,AttributedTo=?,Context=?,MediaType=?,EndTime=?,Generator=?,Icon=?,Image=?,InReplyTo=?,Location=?,Preview=?,PublishedTime=?,StartTime=?,Summary=?,UpdatedTime=?,Likes=?,Shares=?,Inbox=?,Outbox=?,PreferredUsername=?,PublicKey=?,FragmentationKey=?,Username=? WHERE Id=?`
 	statement, err := db.Prepare(sql_cmd)
@@ -129,8 +139,9 @@ func (p *Person) UpdatePerson() error {
 	return nil
 }
 
-func (p *Person) DeletePerson(pid string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) DeletePerson(pid string, frag_num int64) error {
+
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -149,8 +160,8 @@ func (p *Person) DeletePerson(pid string) error {
 	return nil
 }
 
-func (p *Person) GetPersonByFragmentationKey(fragmentationKey string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) GetPersonByFragmentationKey(fragmentationKey string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -179,8 +190,9 @@ func (p *Person) GetPersonByFragmentationKey(fragmentationKey string) error {
 }
 
 // horizontally fragment this table by location
-func (p *Person) FragmentateByLocation() ([]Person, error) {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Person) FragmentateByLocation(frag_num int64) ([]*Person, error) {
+
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		return nil, err
 	}
@@ -192,14 +204,14 @@ func (p *Person) FragmentateByLocation() ([]Person, error) {
 	}
 	defer rows.Close()
 
-	var persons []Person
+	var persons []*Person
 	for rows.Next() {
 		var person Person
 		err = rows.Scan(&person.Id, &person.Attachment, &person.AttributedTo, &person.Context, &person.MediaType, &person.EndTime, &person.Generator, &person.Icon, &person.Image, &person.InReplyTo, &person.Location, &person.Preview, &person.PublishedTime, &person.Replies, &person.StartTime, &person.Summary, &person.UpdatedTime, &person.Url, &person.Too, &person.Bto, &person.Cc, &person.Bcc, &person.Likes, &person.Shares, &person.Inbox, &person.Outbox, &person.Following, &person.Followers, &person.Liked, &person.PreferredUsername, &person.Endpoints, &person.Streams, &person.PublicKey, &person.FragmentationKey, &person.Username)
 		if err != nil {
 			return nil, err
 		}
-		persons = append(persons, person)
+		persons = append(persons, &person)
 	}
 	err = rows.Err()
 	if err != nil {

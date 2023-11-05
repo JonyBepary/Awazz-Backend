@@ -70,34 +70,37 @@ message Community {
   // Unique identifier for the user
   string id = 1;
 
+  // Instance name for the user
+  string instance_name = 2;
   // Instance ID for the user
-  string instance_id = 2;
+  string instance_id = 3;
 
   // Name of the user
-  string name = 3;
+  string name = 4;
 
   // Description of the user
-  string description = 4;
+  string description = 5;
 
   // Icon URL for the user
-  string icon = 5;
+  string icon = 6;
 
   // Cover image URL for the user
-  string cover = 6;
+  string cover = 7;
 
   // Timestamp when the user was created
-  int64 created_at = 7;
+  int64 created_at = 8;
 
   // Timestamp when the user was last updated
-  int64 updated_at = 8;
+  int64 updated_at = 9;
 
   // Number of members in the user's group
-  int64 members = 9;
-  string admins = 10;
-  string moderators = 11;
-  string post = 12;
-  string tags = 13;
-  string labels = 14;
-  string public_domain = 15;
-  string users = 16;
-}
+  int64 members = 10;
+  // These are the different types of entities that can be managed by the system.
+  string admins = 11; // The administrators of the system.
+  string moderators = 12; // The moderators of the system.
+  string post = 13; // A post made by a user.
+  string tags = 14; // Tags associated with a post.
+  string labels = 15; // Labels associated with a post.
+  string public_domain = 16; // The public domain of the system.
+  string users = 17; // The users of the system.
+  }

@@ -8,8 +8,8 @@ import (
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 )
 
-func (msg *Messages) SaveMessages() error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (msg *Messages) SaveMessages(frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -19,13 +19,13 @@ func (msg *Messages) SaveMessages() error {
 		MsgId VARCHAR(255) PRIMARY KEY,
 		SenderId  VARCHAR(255),
 		ReceiverId  VARCHAR(255),
+		Types TEXT,
 		Content TEXT,
 		SentTime INTEGER,
 		LastEdit INTEGER,
 		DeleteTime TEXT,
 		Status BOOL,
 		Attachment TEXT,
-		Types TEXT,
 		Reaction TEXT)
 	`
 	_, err = db.Exec(str)
@@ -46,8 +46,8 @@ func (msg *Messages) SaveMessages() error {
 	return nil
 }
 
-func (m *Messages) GetMessages(msgId string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (m *Messages) GetMessages(msgId string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -76,8 +76,8 @@ func (m *Messages) GetMessages(msgId string) error {
 	return nil
 }
 
-func (u *Messages) UpdatedMessages(msgId string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (u *Messages) UpdatedMessages(msgId string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -92,8 +92,8 @@ func (u *Messages) UpdatedMessages(msgId string) error {
 	return nil
 }
 
-func (d *Messages) DeleteMessages(msgId string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (d *Messages) DeleteMessages(msgId string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}

@@ -7,7 +7,7 @@ option go_package = ".;model";
 message Like {
     string entity_id = 1;
     string user_id = 2;
-    // repeated string comment_id = 3;
+    string entity_type = 3;
     int64 created_at = 4;
 }
 

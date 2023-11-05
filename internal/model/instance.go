@@ -1,16 +1,21 @@
 package model
 
-import "github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
+import (
+	"fmt"
 
-func (p *Community) Create() error {
+	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
+)
 
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (p *Community) Create(frag_num int64) error {
+
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 	str := `CREATE TABLE IF NOT EXISTS COMMUNITY (
 	Id VARCHAR(255) PRIMARY KEY NOT NULL,
+	InstanceName VARCHAR(255),
 	InstanceId VARCHAR(255),
 	Name VARCHAR(255),
 	Description VARCHAR(255),
@@ -27,19 +32,19 @@ func (p *Community) Create() error {
 	if err != nil {
 		panic(err)
 	}
-	statement, err := db.Prepare("INSERT INTO COMMUNITY (Id,InstanceId,Name,Description,Icon,Cover,CreatedAt,UpdatedAt,Members,Admins,Moderators,Post) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+	statement, err := db.Prepare("INSERT INTO COMMUNITY (Id,InstanceId,Name,Description,Icon,Cover,CreatedAt,UpdatedAt,Members,Admins,Moderators,Post, InstanceName) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		panic(err)
 	}
-	_, err = statement.Exec(p.Id, p.InstanceId, p.Name, p.Description, p.Icon, p.Cover, p.CreatedAt, p.UpdatedAt, p.Members, p.Admins, p.Moderators, p.Post)
+	_, err = statement.Exec(p.Id, p.InstanceId, p.Name, p.Description, p.Icon, p.Cover, p.CreatedAt, p.UpdatedAt, p.Members, p.Admins, p.Moderators, p.Post, &p.InstanceName)
 	if err != nil {
 		panic(err)
 	}
 	return nil
 }
 
-func (p *Community) GetCommunity(cid string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Community) GetCommunity(cid string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +58,7 @@ func (p *Community) GetCommunity(cid string) error {
 	}
 
 	row.Next()
-	err = row.Scan(&p.Id, &p.InstanceId, &p.Name, &p.Description, &p.Icon, &p.Cover, &p.CreatedAt, &p.UpdatedAt, &p.Members, &p.Admins, &p.Moderators, &p.Post)
+	err = row.Scan(&p.Id, &p.InstanceName, &p.InstanceId, &p.Name, &p.Description, &p.Icon, &p.Cover, &p.CreatedAt, &p.UpdatedAt, &p.Members, &p.Admins, &p.Moderators, &p.Post)
 	if err != nil {
 		panic(err)
 	}
@@ -67,8 +72,8 @@ func (p *Community) GetCommunity(cid string) error {
 	//! spew.Dump(p.Id)
 	return nil
 }
-func (p *Community) DeleteCommunity(cid string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Community) DeleteCommunity(cid string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -85,29 +90,27 @@ func (p *Community) DeleteCommunity(cid string) error {
 	return nil
 }
 
-func (p *Community) UpdatedCommuninty() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (p *Community) UpdatedCommuninty(frag_num int64) error {
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
-	sql_cmd := `UPDATE COMMUNITY SET Id=?,InstanceId=?,Name=?,Description=?,Icon=?,Cover=?,CreatedAt=?,UpdatedAt=?,Members=?,Admins=?,Moderators=?,Post=?`
+	sql_cmd := `UPDATE COMMUNITY SET Id=?, InstanceName=?, InstanceId=?,Name=?,Description=?,Icon=?,Cover=?,CreatedAt=?,UpdatedAt=?,Members=?,Admins=?,Moderators=?,Post=?`
 	statement, err := db.Prepare(sql_cmd)
 	if err != nil {
 		panic(err)
 	}
-	_, err = statement.Exec(p.Id, p.InstanceId, p.Name, p.Description, p.Icon, p.Cover, p.CreatedAt, p.UpdatedAt, p.Members, p.Admins, p.Moderators, p.Post)
+	_, err = statement.Exec(p.Id, p.InstanceId, p.InstanceId, p.Name, p.Description, p.Icon, p.Cover, p.CreatedAt, p.UpdatedAt, p.Members, p.Admins, p.Moderators, p.Post)
 	if err != nil {
 		panic(err)
 	}
 	return nil
 }
 
+func (p *Instance) Create(frag_num int64) error {
 
-
-func (p *Instance) Create() error {
-
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -140,8 +143,8 @@ func (p *Instance) Create() error {
 	return nil
 }
 
-func (p *Instance) GetInstance(cid string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Instance) GetInstance(cid string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -170,8 +173,8 @@ func (p *Instance) GetInstance(cid string) error {
 	return nil
 }
 
-func (p *Instance) DeleteInstance(cid string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Instance) DeleteInstance(cid string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -188,8 +191,8 @@ func (p *Instance) DeleteInstance(cid string) error {
 	return nil
 }
 
-func (p *Instance) UpdatedInstance() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (p *Instance) UpdatedInstance(frag_num int64) error {
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}

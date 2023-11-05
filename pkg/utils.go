@@ -65,3 +65,18 @@ func FileHashGeneration(filename string) string {
 	hash.Write([]byte(fmt.Sprintf("%v", file)))
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
+
+func toChar(i int) rune {
+	return rune('A' - 1 + i)
+}
+func StringToShard(s string) int64 {
+	var n int64
+	if s == "" {
+		// UserId is missing, return 401
+		n = 0
+	} else {
+		r := []rune(s)
+		n = int64(r[0]) % 6
+	}
+	return n
+}

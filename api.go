@@ -397,16 +397,21 @@ func getPerson(c *gin.Context) {
 }
 
 func delPerson(c *gin.Context) {
-
+	var err error
 	// check if user is logged in
 	if err := check_login(c); err != nil {
 		c.JSON(401, gin.H{"authentication error": err.Error()})
 		return
 	}
 
-	var person model.Person
-	person.Id = c.Query("Id")
-	err := person.DeletePerson(person.Id)
+	p := model.Person{}
+	p.Id = c.Query("Id")
+	shard, TF := durable.Fragmentation_Get(p.Id)
+	if TF {
+		c.JSON(500, gin.H{"error": "person does not exist"})
+		return
+	}
+	err = p.DeletePerson(p.Id, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -418,7 +423,7 @@ func delPerson(c *gin.Context) {
 		return
 	}
 	defer ldb.Close()
-	err = ldb.Delete([]byte(fmt.Sprintf("person_%v", person.Id)), nil)
+	err = ldb.Delete([]byte(fmt.Sprintf("person_%v", p.Id)), nil)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -443,9 +448,14 @@ func savePerson(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+
 	// PRINT community OBJECT TO CONSOLE INTENDED FOR DEBUGGING
-	spew.Config.Indent = "\t"
-	err = person.SavePerson()
+	// spew.Config.Indent = "\t"
+	// spew.Dump(person)
+	shard := pkg.StringToShard(person.Location)
+	durable.Fragmentation_Add(shard, person.Id, person.Username, person.PublicKey)
+	person.FragmentationKey = fmt.Sprintf("%v", shard)
+	err = person.SavePerson(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -532,7 +542,9 @@ func saveCommunity(c *gin.Context) {
 	}
 	ldb.Put([]byte(fmt.Sprintf("community_%v", community.Id)), blob, nil)
 
-	err = community.Create()
+	shard := pkg.StringToShard(community.InstanceName)
+	durable.Fragmentation_Add(shard, community.Id, community.Name, community.PublicDomain)
+	err = community.Create(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -580,7 +592,12 @@ func delCommunity(c *gin.Context) {
 	}
 	var community model.Community
 	community.Id = c.Query("Id")
-	err := community.DeleteCommunity(community.Id)
+	shard, TF := durable.Fragmentation_Get(community.Id)
+	if TF {
+		c.JSON(500, gin.H{"error": "community does not exist"})
+		return
+	}
+	err := community.DeleteCommunity(community.Id, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -621,9 +638,10 @@ func saveInstance(c *gin.Context) {
 	// PRINT instance OBJECT TO CONSOLE INTENDED FOR DEBUGGING
 	// spew.Config.Indent = "\t"
 	// spew.Dump(p)
-
+	shard := pkg.StringToShard(p.Name)
+	durable.Fragmentation_Add(shard, p.Id, p.Name)
 	// Save instance in sqlite database
-	err = p.Create()
+	err = p.Create(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -695,7 +713,13 @@ func delInstance(c *gin.Context) {
 	}
 	var instance model.Instance
 	instance.Id = c.Query("Id")
-	err := instance.DeleteInstance(instance.Id)
+	shard, TF := durable.Fragmentation_Get(instance.Id)
+	if TF {
+		c.JSON(500, gin.H{"error": "instance does not exist"})
+		return
+	}
+
+	err := instance.DeleteInstance(instance.Id, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -815,12 +839,15 @@ func saveMessage(c *gin.Context) {
 	// spew.Config.Indent = "\t"
 	// spew.Dump(p)
 
+	shard := pkg.StringToShard(p.Types)
+
 	// Save instance in sqlite database
-	err = p.SaveMessages()
+	err = p.SaveMessages(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	durable.Fragmentation_Add(shard, p.MsgId, p.SenderId)
 
 	// CREATING LEVELDB DATABASE
 	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
@@ -891,12 +918,18 @@ func delMessage(c *gin.Context) {
 		return
 	}
 	ldb.Close()
+	shard, TF := durable.Fragmentation_Get(p.MsgId)
+	if TF {
+		c.JSON(500, gin.H{"error": "message does not exist"})
+		return
+	}
 
-	err = p.DeleteMessages(p.MsgId)
+	err = p.DeleteMessages(p.MsgId, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	durable.Fragmentation_Remove(p.MsgId)
 
 	c.JSON(200, "Message Deleted")
 }
@@ -1454,9 +1487,10 @@ func saveLike(c *gin.Context) {
 	// PRINT instance OBJECT TO CONSOLE INTENDED FOR DEBUGGING
 	// spew.Config.Indent = "\t"
 	// spew.Dump(p)
-
+	shard := pkg.StringToShard(p.EntityType)
+	durable.Fragmentation_Add(shard, p.UserId, p.EntityId)
 	// Save instance in sqlite database
-	err = p.SaveLikes()
+	err = p.SaveLikes(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -1531,7 +1565,13 @@ func delLike(c *gin.Context) {
 		UserId:   UserID,
 		EntityId: EntityId,
 	}
-	err = p.Delete()
+	shard, TF := durable.Fragmentation_Get(p.EntityId)
+	if TF {
+		c.JSON(500, gin.H{"error": "like does not exist"})
+		return
+	}
+	durable.Fragmentation_Remove(p.EntityId)
+	err = p.Delete(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -1553,9 +1593,15 @@ func getLIKESByUserId(c *gin.Context) {
 	// }
 	// Get the Entity ID from the form data
 	user_id := c.Query("UserId")
+	shard, TF := durable.Fragmentation_Get(user_id)
+	if TF {
+		c.JSON(500, gin.H{"error": "like does not exist"})
+		return
+	}
+
 	// Get the user ID from the session
 	likes := model.Likes{}
-	err := likes.GetByUserId(user_id)
+	err := likes.GetByUserId(user_id, shard)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -1580,7 +1626,13 @@ func getLIKESByEntityId(c *gin.Context) {
 	entity_id := c.Query("EntityId")
 	// Get the user ID from the session
 	likes := model.Likes{}
-	err := likes.GetByEntityId(entity_id)
+	shard, TF := durable.Fragmentation_Get(entity_id)
+	if TF {
+		c.JSON(500, gin.H{"error": "like does not exist"})
+		return
+	}
+
+	err := likes.GetByEntityId(entity_id, shard)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -1611,7 +1663,13 @@ func setLikeByEntityId(c *gin.Context) {
 	user_id := c.Query("user_id")
 	// Get the user ID from the session
 	v := model.Like{EntityId: entity_id, UserId: user_id, CreatedAt: time.Now().Unix()}
-	err := v.SaveLikes()
+	shard, TF := durable.Fragmentation_Get(entity_id)
+	if TF {
+		c.JSON(500, gin.H{"error": "like does not exist"})
+		return
+	}
+
+	err := v.SaveLikes(shard)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
