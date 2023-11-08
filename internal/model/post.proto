@@ -105,7 +105,7 @@ message Post {
 
   // Indicates if the poll hides the total number of votes.
   bool is_poll_hide_totals = 33;
-  
+
   // Fragmented key if available.
   string FragmentationKey = 34;
 }
