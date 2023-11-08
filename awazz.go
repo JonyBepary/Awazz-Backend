@@ -22,6 +22,7 @@ func main() {
 	r.DELETE("/instance", delInstance)
 	r.POST("/comments", saveComment)
 	r.GET("/comments", getComment)
+	r.GET("/commentsbypost", getCommentsByPost)
 	r.DELETE("/comments", delComment)
 	r.POST("/message", saveMessage)
 	r.GET("/message", getMessage)

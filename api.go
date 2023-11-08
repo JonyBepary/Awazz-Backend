@@ -755,9 +755,15 @@ func saveComment(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	p.Likes, err = strconv.ParseInt(c.Query("Likes"), 10, 64)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
 	// PRINT instance OBJECT TO CONSOLE INTENDED FOR DEBUGGING
-	spew.Config.Indent = "\t"
-	spew.Dump(p)
+	// spew.Config.Indent = "\t"
+	// spew.Dump(&p)
 
 	// getting array of string from QueryArray
 	p.Replies = c.QueryArray("Replies")
@@ -765,6 +771,13 @@ func saveComment(c *gin.Context) {
 	p.IsDeleted = c.Query("IsUpdated") == "true" || false
 	// Save instance in sqlite database
 	err = p.Save()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	shard := pkg.StringToShard(p.PostId)
+	err = p.SavetoSQL(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -787,6 +800,20 @@ func getComment(c *gin.Context) {
 	//! println("pid: " + pid)
 	// err := p.GetCommunity(Iid)
 	err := p.Get()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, &p)
+}
+func getCommentsByPost(c *gin.Context) {
+
+	var p []model.Comment
+	PostId := c.Query("pid")
+	//! println("pid: " + pid)
+	// err := p.GetCommunity(Iid)
+	err := model.GetFromByPost(&p, PostId)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
