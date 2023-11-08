@@ -12,6 +12,9 @@ import (
 	ulid "github.com/oklog/ulid/v2"
 )
 
+
+// ULID FUNCTIONS IS Universally Unique Lexicographically Sortable Identifier
+// FOR FILE NAMING
 func GetUlid() string {
 	r := rand.New(new(rand.LockedSource))
 	return ulid.MustNew(ulid.Timestamp(time.Now()), ulid.Monotonic(r, 0)).String()
@@ -25,9 +28,9 @@ func ReadFile(path string) []byte {
 		return nil
 	}
 	return data
-
 }
 
+// READ PUBLIC KEY
 func ReadServerPKI() (*model.AKS, error) {
 	pk := &model.AKS{
 		Id: "server_default",
@@ -39,6 +42,7 @@ func ReadServerPKI() (*model.AKS, error) {
 	return pk, nil
 }
 
+// Write Server PUBLIC KEY
 func WriteServerPKI() (*model.AKS, error) {
 	pk := &model.AKS{
 		Id: "server_default",
@@ -50,31 +54,35 @@ func WriteServerPKI() (*model.AKS, error) {
 	return pk, nil
 }
 
+
+// HASH FUNCTIONS FOR STRING
 func StringHashGeneration(str string) string {
 	digest := sha256.New()
 	digest.Write([]byte(str))
+
 	return fmt.Sprintf("%x", digest.Sum(nil))
 }
 
+// HASH FUNCTIONS FOR FILE
 func FileHashGeneration(filename string) string {
-	hash := sha256.New()
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		return ""
 	}
-	hash.Write([]byte(fmt.Sprintf("%v", file)))
-	return fmt.Sprintf("%x", hash.Sum(nil))
+
+	digest := sha256.New()
+	digest.Write(file)
+	return fmt.Sprintf("%x", digest.Sum(nil))
 }
 
-func toChar(i int) rune {
-	return rune('A' - 1 + i)
-}
+
+// string to shard determiner
 func StringToShard(s string) int64 {
 	var n int64
 	if s == "" {
 		// UserId is missing, return 401
 		n = 0
-	} else {
+		} else {
 		r := []rune(s)
 		n = int64(r[0]) % 6
 	}
@@ -86,7 +94,7 @@ func StringFullToShard(s string) int64 {
 	if s == "" {
 		// UserId is missing, return 401
 		n = 0
-	} else {
+		} else {
 		for _, r := range []rune(s) {
 			n += int64(r)
 		}
@@ -94,3 +102,11 @@ func StringFullToShard(s string) int64 {
 	}
 	return n
 }
+
+
+
+
+
+// func toChar(i int) rune {
+// 	return rune('A' - 1 + i)
+// }

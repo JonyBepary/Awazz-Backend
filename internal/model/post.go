@@ -1,18 +1,20 @@
 package model
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 )
 
-func (p *Post) SavePost() error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (p *Post) SavePost(frag_num int64) error {
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+
 	str := `
 	CREATE TABLE IF NOT EXISTS POST(
     Id VARCHAR(255) PRIMARY KEY,
@@ -53,59 +55,29 @@ func (p *Post) SavePost() error {
 	if err != nil {
 		panic(err)
 	}
-	str2 := `INSERT INTO Post (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Shares,Comments,Author,Parent,Rank,IsSensitive,IsNsfw,IsDeleted,IsPinned,IsEdited,IsLiked,IsShared,IsCommented,IsSubscribed,IsBookmarked,IsReblogged,IsMentioned,IsPoll,IsPollVoted,IsPollExpired,IsPollClosed,IsPollMultiple,IsPollHideTotals,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+
+	str2 := `INSERT INTO POST (Id,Community,Content,CreatedAt,UpdatedAt,DeletedAt,Likes,Shares,Comments,Author,Parent,Rank,IsSensitive,IsNsfw,IsDeleted,IsPinned,IsEdited,IsLiked,IsShared,IsCommented,IsSubscribed,IsBookmarked,IsReblogged,IsMentioned,IsPoll,IsPollVoted,IsPollExpired,IsPollClosed,IsPollMultiple,IsPollHideTotals,FragmentationKey) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	`
 	statement, err := db.Prepare(str2)
 	if err != nil {
 		panic(err)
 	}
-	_, err = (statement.Exec(p.Id,
-		p.Community,
-		p.Content,
-		p.CreatedAt,
-		p.UpdatedAt,
-		p.DeletedAt,
-		p.Likes,
-		p.Shares,
-		p.Comments,
-		p.Author,
-		p.Parent,
-		p.Rank,
-		p.IsSensitive,
-		p.IsNsfw,
-		p.IsDeleted,
-		p.IsPinned,
-		p.IsEdited,
-		p.IsLiked,
-		p.IsShared,
-		p.IsCommented,
-		p.IsSubscribed,
-		p.IsBookmarked,
-		p.IsReblogged,
-		p.IsMentioned,
-		p.IsPoll,
-		p.IsPollVoted,
-		p.IsPollExpired,
-		p.IsPollClosed,
-		p.IsPollMultiple,
-		p.IsPollHideTotals,
-		p.FragmentationKey,
-	))
+	_, err = statement.Exec(p.Id, p.Community, p.Content, p.CreatedAt, p.UpdatedAt, p.DeletedAt, p.Likes, p.Shares, p.Comments, p.Author, p.Parent, p.Rank, p.IsSensitive, p.IsNsfw, p.IsDeleted, p.IsPinned, p.IsEdited, p.IsLiked, p.IsShared, p.IsCommented, p.IsSubscribed, p.IsBookmarked, p.IsReblogged, p.IsMentioned, p.IsPoll, p.IsPollVoted, p.IsPollExpired, p.IsPollClosed, p.IsPollMultiple, p.IsPollHideTotals, p.FragmentationKey)
 	if err != nil {
 		panic(err)
 	}
 
 	return nil
 }
-func (p *Post) GetPost(msgId string) error {
-	db, err := durable.CreateDatabase("Database/", "Common", "Shard_0.sqlite")
+func (p *Post) GetPost(msgId string, frag_num int64) error {
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
 	// spew.Dump(rows)
-	rows, err := db.Query("SELECT * FROM ")
+	rows, err := db.Query("SELECT * FROM POST WHERE Id = ?", msgId)
 	if err != nil {
 		panic(err)
 	}
@@ -124,8 +96,8 @@ func (p *Post) GetPost(msgId string) error {
 
 	return nil
 }
-func (u *Post) UpdatePost(ID string) error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (u *Post) UpdatePost(ID string, frag_num int64) error {
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
@@ -140,19 +112,19 @@ func (u *Post) UpdatePost(ID string) error {
 
 	return nil
 }
-func (d *Post) DeletePost(Id string) error {
-	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
+func (d *Post) DeletePost(Id string, frag_num int64) error {
+	db, err := durable.CreateDatabase("./Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
 
 	_, err = db.Exec("DELETE FROM  POST WHERE  Id= ?", Id)
+	if err != nil {
+		panic(err)
+	}
 
 	d.UpdatedAt = time.Now().Unix()
 
-	if err != nil {
-		log.Fatal(err)
-	}
 	return nil
 }

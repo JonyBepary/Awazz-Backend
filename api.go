@@ -305,7 +305,13 @@ func delPost(c *gin.Context) {
 
 	var post model.Post
 	post.Id = c.Query("Id")
-	err := post.DeletePost(post.Id)
+	shard, err := durable.Fragmentation_Get(post.Id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "post does not exist"})
+		return
+	}
+
+	err = post.DeletePost(post.Id, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -341,7 +347,11 @@ func savePost(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	err = post.SavePost()
+	spew.Dump(post.Community)
+	shard := pkg.StringToShard(post.Community)
+	durable.Fragmentation_Add(shard, post.Id)
+	spew.Dump(shard)
+	err = post.SavePost(shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -406,8 +416,8 @@ func delPerson(c *gin.Context) {
 
 	p := model.Person{}
 	p.Id = c.Query("Id")
-	shard, TF := durable.Fragmentation_Get(p.Id)
-	if TF {
+	shard, err := durable.Fragmentation_Get(p.Id)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "person does not exist"})
 		return
 	}
@@ -592,12 +602,12 @@ func delCommunity(c *gin.Context) {
 	}
 	var community model.Community
 	community.Id = c.Query("Id")
-	shard, TF := durable.Fragmentation_Get(community.Id)
-	if TF {
+	shard, err := durable.Fragmentation_Get(community.Id)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "community does not exist"})
 		return
 	}
-	err := community.DeleteCommunity(community.Id, shard)
+	err = community.DeleteCommunity(community.Id, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -713,13 +723,13 @@ func delInstance(c *gin.Context) {
 	}
 	var instance model.Instance
 	instance.Id = c.Query("Id")
-	shard, TF := durable.Fragmentation_Get(instance.Id)
-	if TF {
+	shard, err := durable.Fragmentation_Get(instance.Id)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "instance does not exist"})
 		return
 	}
 
-	err := instance.DeleteInstance(instance.Id, shard)
+	err = instance.DeleteInstance(instance.Id, shard)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -945,8 +955,8 @@ func delMessage(c *gin.Context) {
 		return
 	}
 	ldb.Close()
-	shard, TF := durable.Fragmentation_Get(p.MsgId)
-	if TF {
+	shard, err := durable.Fragmentation_Get(p.MsgId)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "message does not exist"})
 		return
 	}
@@ -1592,8 +1602,8 @@ func delLike(c *gin.Context) {
 		UserId:   UserID,
 		EntityId: EntityId,
 	}
-	shard, TF := durable.Fragmentation_Get(p.EntityId)
-	if TF {
+	shard, err := durable.Fragmentation_Get(p.EntityId)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "like does not exist"})
 		return
 	}
@@ -1620,15 +1630,15 @@ func getLIKESByUserId(c *gin.Context) {
 	// }
 	// Get the Entity ID from the form data
 	user_id := c.Query("UserId")
-	shard, TF := durable.Fragmentation_Get(user_id)
-	if TF {
+	shard, err := durable.Fragmentation_Get(user_id)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "like does not exist"})
 		return
 	}
 
 	// Get the user ID from the session
 	likes := model.Likes{}
-	err := likes.GetByUserId(user_id, shard)
+	err = likes.GetByUserId(user_id, shard)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -1653,13 +1663,13 @@ func getLIKESByEntityId(c *gin.Context) {
 	entity_id := c.Query("EntityId")
 	// Get the user ID from the session
 	likes := model.Likes{}
-	shard, TF := durable.Fragmentation_Get(entity_id)
-	if TF {
+	shard, err := durable.Fragmentation_Get(entity_id)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "like does not exist"})
 		return
 	}
 
-	err := likes.GetByEntityId(entity_id, shard)
+	err = likes.GetByEntityId(entity_id, shard)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -1690,13 +1700,13 @@ func setLikeByEntityId(c *gin.Context) {
 	user_id := c.Query("user_id")
 	// Get the user ID from the session
 	v := model.Like{EntityId: entity_id, UserId: user_id, CreatedAt: time.Now().Unix()}
-	shard, TF := durable.Fragmentation_Get(entity_id)
-	if TF {
+	shard, err := durable.Fragmentation_Get(entity_id)
+	if err != nil {
 		c.JSON(500, gin.H{"error": "like does not exist"})
 		return
 	}
 
-	err := v.SaveLikes(shard)
+	err = v.SaveLikes(shard)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

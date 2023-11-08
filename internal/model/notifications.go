@@ -8,6 +8,7 @@ import (
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
 )
 
+//create table
 func (n *Notifications) SaveNotifications() error {
 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 
@@ -47,7 +48,7 @@ INSERT INTO NOTIFICATIONS (Receiver,Title,Body,Source,Image,Sound,Time,Channel,P
 
 	return nil
 }
-
+/// read table
 func (n *Notifications) GetNotifications(msgId string) error {
 	db, err := durable.CreateDatabase("./Database/", "Common", "Shard_0.sqlite")
 	if err != nil {

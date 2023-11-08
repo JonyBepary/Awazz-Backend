@@ -40,26 +40,26 @@ func Fragmentation_Remove(key string) {
 }
 
 // // Get returns the shard for a given rowID.
-func Fragmentation_Get(rowID string) (int64, bool) {
+func Fragmentation_Get(rowID string) (int64, error) {
 	ldb, err := LevelDBCreateDatabase("Database/", "GlobalSchema", "/")
 	if err != nil {
 		log.Print(err)
-		return -1, false
+		return -1, fmt.Errorf("error in creating database")
 	}
+	defer ldb.Close()
 	shard, err := ldb.Get([]byte(rowID), nil)
 	if err != nil {
 		log.Print(err)
-		return -1, false
+		return -1, fmt.Errorf("error in getting shard")
 	}
 	// conver shard to int64
 	n, err := strconv.ParseInt(string(shard), 10, 64)
 	if err != nil {
 		log.Print(err)
-		return -1, false
+		return -1, fmt.Errorf("error in converting shard to int64")
 	}
 
-	defer ldb.Close()
-	return n, true
+	return n, nil
 }
 
 // // FRAGMENTATION TO FILE MARSHALJSON
