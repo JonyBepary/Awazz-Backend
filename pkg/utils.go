@@ -80,3 +80,17 @@ func StringToShard(s string) int64 {
 	}
 	return n
 }
+
+func StringFullToShard(s string) int64 {
+	var n int64
+	if s == "" {
+		// UserId is missing, return 401
+		n = 0
+	} else {
+		for _, r := range []rune(s) {
+			n += int64(r)
+		}
+		n = n % 6
+	}
+	return n
+}

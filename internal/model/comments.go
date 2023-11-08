@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/SohelAhmedJoni/Awazz-Backend/internal/durable"
+	"github.com/syndtr/goleveldb/leveldb/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -22,6 +23,71 @@ func (cm *Comment) Get() error {
 	err = proto.Unmarshal(data, cm)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func GetFromByPost(cms *[]Comment, PostId string) error {
+	ldb, err := durable.LevelDBCreateDatabase("Database/", "NOSQL", "/")
+	if err != nil {
+		return nil
+	}
+	defer ldb.Close()
+
+	iter := ldb.NewIterator(util.BytesPrefix([]byte(fmt.Sprintf("comment-%v", PostId))), nil)
+
+	for iter.Next() {
+		var cm Comment
+		err = proto.Unmarshal(iter.Value(), &cm)
+		if err != nil {
+			return nil
+		}
+		*cms = append(*cms, cm)
+	}
+
+	iter.Release()
+	err = iter.Error()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cm *Comment) SavetoSQL(frag_num int64) error {
+	//mysql put
+	db, err := durable.CreateDatabase("Database/", "Common", fmt.Sprintf("Shard_%d.sqlite", frag_num))
+	if err != nil {
+		return err
+	}
+	sql := `CREATE TABLE IF NOT EXISTS Comment (
+    Id  VARCHAR(250) PRIMARY KEY,
+    User VARCHAR(250) NOT NULL,
+    PostId VARCHAR(250) NOT NULL,
+    UserId VARCHAR(250) NOT NULL,
+    RepliedTo VARCHAR(250),
+    Content TEXT,
+    CreatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Likes INTEGER DEFAULT 0,
+    Replies INTEGER DEFAULT 0,
+    IsDeleted BOOLEAN DEFAULT 0,
+    IsUpdated BOOLEAN DEFAULT 0
+)`
+	defer db.Close()
+	_, err = db.Exec(sql)
+	if err != nil {
+		return err
+	}
+	statement, err := db.Prepare("INSERT INTO Comment (Id,User,PostId,UserId,RepliedTo,Content,CreatedDate,UpdatedDate,Likes,Replies,IsDeleted,IsUpdated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+
+	if err != nil {
+		panic(err)
+	}
+	cm.IsDeleted = false
+	cm.IsUpdated = false
+	_, err = statement.Exec(cm.Id, cm.User, cm.PostId, cm.UserId, cm.RepliedTo, cm.Content, cm.CreatedDate, cm.UpdatedDate, cm.Likes, len(cm.Replies), cm.IsDeleted, cm.IsUpdated)
+	if err != nil {
+		panic(err)
 	}
 	return nil
 }

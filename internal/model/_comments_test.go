@@ -12,10 +12,10 @@ import (
 func TestComments_Save_Get(t *testing.T) {
 	// Create a new Comments object with some data
 	cm := &Comment{
-
+		
 		PostId: "1",
 		Id:     "2",
-		Text:   "This is a comment",
+		Content:   "This is a comment",
 	}
 
 	// Call the Save method
