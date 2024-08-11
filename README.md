@@ -68,7 +68,7 @@ AwazZ is a decentralized and federated social media app designed to prioritize u
    ```sh
    go run .
    ```
-5. The backend server will start on `localhost:5669`.
+5. The backend server will start on `localhost:9091`.
 
 ## Contributing
 
